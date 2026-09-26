@@ -4,9 +4,296 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Posts · Daybook</title>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
-  <body>
-    <div id="app"></div>
+  <body class="bg-base-200 text-base-content antialiased">
+    <div class="drawer lg:drawer-open">
+      <input id="drawer" type="checkbox" class="drawer-toggle" />
+
+      <!-- ========================= MAIN COLUMN ========================= -->
+      <div class="drawer-content flex min-h-dvh min-w-0 flex-col">
+        <!-- Top bar -->
+        <header class="sticky top-0 z-20 flex h-16 items-end justify-between border-b border-base-300 bg-base-100/85 px-3 backdrop-blur sm:px-8">
+          <div class="flex items-end">
+            <label for="drawer" class="btn btn-ghost btn-square mb-1.5 mr-1 lg:hidden" aria-label="Open menu">
+              <i class="fa-solid fa-bars"></i>
+            </label>
+            <nav class="flex items-end" aria-label="Pages">
+              <a href="/" aria-current="page" class="flex items-center gap-2 border-b-[3px] border-marigold px-3 pb-3.5 pt-2 font-medium sm:px-4">
+                <i class="fa-solid fa-newspaper"></i>Posts
+              </a>
+              <a href="/todo.html" class="flex items-center gap-2 border-b-[3px] border-transparent px-3 pb-3.5 pt-2 font-medium text-base-content/55 transition-colors hover:text-base-content sm:px-4">
+                <i class="fa-solid fa-list-check"></i>Todo
+              </a>
+            </nav>
+          </div>
+
+          <div class="mb-2 flex items-center">
+            <div id="search-wrap" class="w-0 overflow-hidden transition-[width] duration-300" inert>
+              <input id="search" type="search" class="input input-sm w-44 rounded-full sm:w-64" placeholder="Search posts" aria-label="Search posts" />
+            </div>
+            <button id="search-toggle" class="btn btn-ghost btn-circle" aria-label="Search" aria-expanded="false">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- Page content -->
+        <main class="flex-1 px-4 py-8 sm:px-10 sm:py-10">
+          <div class="mx-auto max-w-2xl">
+            <div class="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h1 id="feed-title" class="flex items-center gap-3 font-display text-4xl font-semibold tracking-tight">All posts</h1>
+                <p id="feed-count" class="mt-1 text-base-content/60">3 posts</p>
+              </div>
+              <button id="new-post-btn" class="btn btn-primary"><i class="fa-solid fa-plus"></i>New post</button>
+            </div>
+
+            <div id="feed" class="mt-8 space-y-8"></div>
+
+            <div id="feed-empty" class="hidden rounded-3xl border-2 border-dashed border-base-300 bg-base-100/60 px-6 py-16 text-center">
+              <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-xl text-primary"><i id="feed-empty-icon" class="fa-solid fa-pen-nib"></i></span>
+              <h3 id="feed-empty-title" class="mt-4 font-display text-xl font-semibold">No posts here yet</h3>
+              <p id="feed-empty-text" class="mt-1 text-base-content/60">Write the first one for this category.</p>
+              <button id="feed-empty-btn" class="btn btn-primary mt-5"><i class="fa-solid fa-plus"></i>New post</button>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <!-- ========================= SIDEBAR ========================= -->
+      <div class="drawer-side z-30">
+        <label for="drawer" aria-label="Close menu" class="drawer-overlay"></label>
+        <aside class="flex h-full w-72 flex-col bg-pine-950 text-pine-text">
+          <a href="/" class="flex items-center gap-3 px-6 pb-4 pt-6">
+            <span class="grid size-10 place-items-center rounded-xl bg-marigold text-pine-950"><i class="fa-solid fa-book-open"></i></span>
+            <span class="font-display text-2xl font-semibold text-white">Daybook</span>
+          </a>
+
+          <div class="px-6">
+            <label class="input w-full rounded-xl border-white/10 bg-white/10 text-white focus-within:border-marigold focus-within:outline-none">
+              <i class="fa-solid fa-magnifying-glass text-pine-muted"></i>
+              <input id="cat-search" type="search" class="placeholder:text-pine-muted" placeholder="Search categories" aria-label="Search categories" />
+            </label>
+          </div>
+
+          <div class="mx-6 my-5 h-px bg-white/10"></div>
+
+          <div class="mb-2 flex items-center justify-between px-6">
+            <h2 class="text-sm font-semibold text-pine-muted">Categories</h2>
+            <button id="cat-add" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Add category" title="Add category">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+
+          <ul id="cat-list" class="flex-1 space-y-1 overflow-y-auto pr-4">
+            <!-- "All" is real markup, always first -->
+            <li>
+              <button data-cat="all" aria-current="true" class="flex w-full items-center gap-3 rounded-r-xl border-l-4 border-marigold bg-white/10 py-2.5 pl-5 pr-3 text-left font-medium text-white">
+                <i class="fa-solid fa-layer-group w-2.5 text-center text-pine-muted"></i>
+                <span class="flex-1 truncate">All</span>
+                <span data-count="all" class="text-xs tabular-nums text-pine-muted">3</span>
+              </button>
+            </li>
+            <!-- category <li> items are cloned from #category-item-template by posts.js -->
+          </ul>
+
+          <div id="user-card" class="m-4 flex items-center gap-3 rounded-2xl bg-white/5 p-3"></div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ========================= TEMPLATES ========================= -->
+    <!-- Real <template> tags: standard HTML, cloned by JS instead of built from strings. -->
+
+    <template id="category-item-template">
+      <li class="group relative">
+        <button data-cat="" class="flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5">
+          <span data-role="dot" class="size-2.5 shrink-0 rounded-full"></span>
+          <span data-role="name" class="flex-1 truncate"></span>
+          <span data-role="count" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0 group-focus-within:opacity-0"></span>
+        </button>
+        <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+          <button data-action="edit-cat" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename category"><i class="fa-solid fa-pen"></i></button>
+          <button data-action="delete-cat" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete category"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </li>
+    </template>
+
+    <template id="post-template">
+      <article class="overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-sm" data-role="article">
+        <div class="relative aspect-[16/7] overflow-hidden" data-role="cover">
+          <div class="cover-pattern absolute inset-0"></div>
+          <i class="fa-solid fa-feather-pointed absolute -bottom-8 right-6 -rotate-12 text-[9rem] text-white/15"></i>
+          <img data-role="image" src="" alt="" loading="lazy" class="absolute inset-0 hidden size-full object-cover" />
+
+          <div class="absolute left-4 top-4 rounded-full bg-white shadow-sm">
+            <span data-role="chip" class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
+              <span data-role="chip-dot" class="size-2 rounded-full"></span>
+              <span data-role="chip-name"></span>
+            </span>
+          </div>
+          <div class="absolute right-4 top-4 flex gap-2">
+            <button data-action="edit-post" class="btn btn-circle btn-sm border-0 bg-white/90 text-base-content shadow-sm hover:bg-white" aria-label="Edit post"><i class="fa-solid fa-pen"></i></button>
+            <button data-action="delete-post" class="btn btn-circle btn-sm border-0 bg-white/90 text-error shadow-sm hover:bg-white" aria-label="Delete post"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+
+        <div class="px-6 pb-5 pt-6">
+          <h2 data-role="title" class="font-display text-2xl font-semibold leading-tight"></h2>
+          <p data-role="body" class="mt-2 hidden whitespace-pre-line leading-relaxed text-base-content/75"></p>
+
+          <div class="mt-6 flex items-center justify-between gap-3">
+            <div class="flex min-w-0 items-center gap-3">
+              <span data-role="avatar" class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"></span>
+              <div class="min-w-0 leading-tight">
+                <p data-role="author" class="truncate text-sm font-medium"></p>
+                <p data-role="time" class="text-xs text-base-content/55"></p>
+              </div>
+            </div>
+            <button data-action="toggle-comments" aria-expanded="false" class="btn btn-neutral btn-sm rounded-full">
+              <i class="fa-regular fa-comment"></i>Comments
+              <span data-role="comment-count" class="badge badge-sm border-0 bg-white/20 text-neutral-content">0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="comments" data-role="comments-panel">
+          <div inert>
+            <div class="border-t border-base-300 bg-base-200/60 px-6 py-5">
+              <p data-role="no-comments" class="mb-4 hidden text-sm text-base-content/60">No comments yet. Start the conversation.</p>
+              <ul data-role="comment-list" class="mb-5 hidden space-y-4"></ul>
+              <form data-role="comment-form" class="flex items-center gap-3">
+                <span data-role="comment-form-avatar" class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"></span>
+                <input name="text" class="input grow rounded-full" maxlength="500" required autocomplete="off" placeholder="Write a comment" aria-label="Write a comment" />
+                <button class="btn btn-primary btn-circle" aria-label="Send comment"><i class="fa-solid fa-paper-plane"></i></button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <template id="comment-template">
+      <li class="group flex gap-3" data-role="comment-item">
+        <span data-role="avatar" class="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"></span>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-baseline gap-2">
+            <span data-role="author" class="text-sm font-semibold"></span>
+            <span data-role="time" class="text-xs text-base-content/55"></span>
+          </div>
+          <p data-role="text" class="whitespace-pre-line break-words text-sm leading-relaxed text-base-content/85"></p>
+          <form data-role="edit-form" hidden class="mt-1.5 flex items-center gap-2">
+            <input name="text" class="input input-sm grow" maxlength="500" required autocomplete="off" aria-label="Edit comment" />
+            <button class="btn btn-primary btn-sm btn-square" aria-label="Save comment"><i class="fa-solid fa-check"></i></button>
+            <button type="button" data-action="cancel-edit-comment" class="btn btn-ghost btn-sm btn-square" aria-label="Cancel"><i class="fa-solid fa-xmark"></i></button>
+          </form>
+        </div>
+        <div data-role="comment-actions" class="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+          <button data-action="edit-comment" class="btn btn-ghost btn-xs btn-circle" aria-label="Edit comment"><i class="fa-solid fa-pen"></i></button>
+          <button data-action="delete-comment" class="btn btn-ghost btn-xs btn-circle text-error" aria-label="Delete comment"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </li>
+    </template>
+
+    <!-- Post add/edit form, reused for both by swapping its title/button text -->
+    <template id="post-form-template">
+      <form class="p-6">
+        <div class="flex items-start justify-between">
+          <h3 data-role="modal-title" class="font-display text-2xl font-semibold">Write a post</h3>
+          <button type="button" data-action="close-modal" class="btn btn-ghost btn-sm btn-circle -mr-2 -mt-1" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <label class="mt-5 block">
+          <span class="mb-1.5 block text-sm font-medium">Title</span>
+          <input name="title" class="input w-full" maxlength="90" required autofocus placeholder="Give your post a title" />
+        </label>
+
+        <label class="mt-4 block">
+          <span class="mb-1.5 block text-sm font-medium">Story</span>
+          <textarea name="body" class="textarea min-h-32 w-full" maxlength="1000" placeholder="What do you want to share?"></textarea>
+        </label>
+
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <label class="block">
+            <span class="mb-1.5 block text-sm font-medium">Category</span>
+            <select name="categoryId" class="select w-full" data-role="category-select">
+              <option value="">Uncategorized</option>
+            </select>
+          </label>
+          <label class="block">
+            <span class="mb-1.5 block text-sm font-medium">Cover image link <span class="font-normal text-base-content/50">(optional)</span></span>
+            <input name="imageUrl" type="url" class="input w-full" placeholder="https://…" />
+          </label>
+        </div>
+
+        <div class="mt-7 flex justify-end gap-2">
+          <button type="button" data-action="close-modal" class="btn btn-ghost">Cancel</button>
+          <button data-role="submit-btn" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i>Publish</button>
+        </div>
+      </form>
+    </template>
+
+    <!-- Category add/edit form -->
+    <template id="category-form-template">
+      <form class="p-6">
+        <h3 data-role="modal-title" class="font-display text-xl font-semibold">New category</h3>
+
+        <label class="mt-5 block">
+          <span class="mb-1.5 block text-sm font-medium">Name</span>
+          <input name="name" class="input w-full" maxlength="24" required placeholder="e.g. Health" />
+        </label>
+
+        <fieldset class="mt-5">
+          <legend class="mb-2 text-sm font-medium">Color</legend>
+          <div data-role="swatches" class="flex flex-wrap gap-3"></div>
+        </fieldset>
+
+        <div class="mt-7 flex justify-end gap-2">
+          <button type="button" data-action="close-modal" class="btn btn-ghost">Cancel</button>
+          <button data-role="submit-btn" class="btn btn-primary"><i class="fa-solid fa-check"></i>Add category</button>
+        </div>
+      </form>
+    </template>
+
+    <template id="swatch-template">
+      <label class="group cursor-pointer">
+        <input type="radio" name="color" value="" class="peer sr-only" />
+        <span data-role="swatch" class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
+          <i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i>
+        </span>
+      </label>
+    </template>
+
+    <!-- Confirm-delete dialog -->
+    <template id="confirm-template">
+      <div class="p-6">
+        <div class="flex items-start gap-4">
+          <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-error/10 text-error"><i class="fa-solid fa-triangle-exclamation"></i></span>
+          <div>
+            <h3 data-role="title" class="font-display text-xl font-semibold"></h3>
+            <p data-role="message" class="mt-1 text-base-content/70"></p>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-end gap-2">
+          <button data-action="cancel" class="btn btn-ghost">Cancel</button>
+          <button data-action="confirm" class="btn btn-error"><i class="fa-solid fa-trash"></i><span data-role="confirm-label">Delete</span></button>
+        </div>
+      </div>
+    </template>
+
+    <!-- Name / login prompt -->
+    <template id="welcome-template">
+      <form class="p-8 text-center">
+        <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-marigold text-2xl text-pine-950"><i class="fa-solid fa-book-open"></i></span>
+        <h3 class="mt-5 font-display text-2xl font-semibold">Welcome to Daybook</h3>
+        <p class="mt-2 text-base-content/70">What should we call you? Your name shows on the posts and comments you write.</p>
+        <input name="name" class="input mt-6 w-full text-center" maxlength="24" required autofocus placeholder="Your name" aria-label="Your name" />
+        <button class="btn btn-primary mt-4 w-full">Get started</button>
+        <p class="mt-4 text-xs text-base-content/50">Demo login. Everything is saved only in this browser.</p>
+      </form>
+    </template>
+
     <script type="module" src="/src/posts.js"></script>
   </body>
 </html>

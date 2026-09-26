@@ -4,9 +4,216 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Todo · Daybook</title>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
-  <body>
-    <div id="app"></div>
+  <body class="bg-base-200 text-base-content antialiased">
+    <div class="drawer lg:drawer-open">
+      <input id="drawer" type="checkbox" class="drawer-toggle" />
+
+      <!-- ========================= MAIN COLUMN ========================= -->
+      <div class="drawer-content flex min-h-dvh min-w-0 flex-col">
+        <!-- Top bar -->
+        <header class="sticky top-0 z-20 flex h-16 items-end justify-between border-b border-base-300 bg-base-100/85 px-3 backdrop-blur sm:px-8">
+          <div class="flex items-end">
+            <label for="drawer" class="btn btn-ghost btn-square mb-1.5 mr-1 lg:hidden" aria-label="Open menu">
+              <i class="fa-solid fa-bars"></i>
+            </label>
+            <nav class="flex items-end" aria-label="Pages">
+              <a href="/" class="flex items-center gap-2 border-b-[3px] border-transparent px-3 pb-3.5 pt-2 font-medium text-base-content/55 transition-colors hover:text-base-content sm:px-4">
+                <i class="fa-solid fa-newspaper"></i>Posts
+              </a>
+              <a href="/todo.html" aria-current="page" class="flex items-center gap-2 border-b-[3px] border-marigold px-3 pb-3.5 pt-2 font-medium sm:px-4">
+                <i class="fa-solid fa-list-check"></i>Todo
+              </a>
+            </nav>
+          </div>
+
+          <div class="mb-2 flex items-center">
+            <div id="search-wrap" class="w-0 overflow-hidden transition-[width] duration-300" inert>
+              <input id="search" type="search" class="input input-sm w-44 rounded-full sm:w-64" placeholder="Search todos" aria-label="Search todos" />
+            </div>
+            <button id="search-toggle" class="btn btn-ghost btn-circle" aria-label="Search" aria-expanded="false">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- Page content -->
+        <main class="flex-1 px-4 py-8 sm:px-10 sm:py-10">
+          <div class="mx-auto max-w-2xl">
+            <h1 id="head-title" class="flex items-center gap-3 font-display text-4xl font-semibold tracking-tight">All todos</h1>
+            <div class="mt-3 flex items-center gap-4">
+              <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-base-300" role="progressbar" id="progress-track" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" aria-label="Completed">
+                <div id="progress-bar" class="h-full rounded-full bg-primary transition-all duration-500" style="width: 25%"></div>
+              </div>
+              <p class="shrink-0 text-sm text-base-content/60"><span id="progress-done" class="font-semibold text-base-content">1</span> of <span id="progress-total">4</span> done</p>
+            </div>
+
+            <form id="add-form" class="mt-6 flex flex-col gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 shadow-sm focus-within:ring-2 focus-within:ring-primary/30 sm:flex-row sm:items-center">
+              <div class="flex grow items-center gap-3 pl-3">
+                <i class="fa-regular fa-circle shrink-0 text-base-content/35" aria-hidden="true"></i>
+                <input name="text" class="w-full bg-transparent py-2 text-lg outline-none placeholder:text-base-content/40" maxlength="120" required autocomplete="off" placeholder="Add a todo" aria-label="Add a todo" />
+              </div>
+              <div id="add-target" class="flex items-center gap-2"></div>
+              <button class="btn btn-primary"><i class="fa-solid fa-plus"></i>Add</button>
+            </form>
+
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+              <div class="inline-flex rounded-full border border-base-300 bg-base-100 p-1" role="group" aria-label="Filter todos">
+                <button data-filter="all" aria-pressed="true" class="rounded-full bg-neutral px-4 py-1.5 text-sm font-medium text-neutral-content">All <span class="text-neutral-content/70" id="count-all">4</span></button>
+                <button data-filter="active" aria-pressed="false" class="rounded-full px-4 py-1.5 text-sm font-medium text-base-content/65 transition-colors hover:text-base-content">Active <span class="text-base-content/45" id="count-active">3</span></button>
+                <button data-filter="done" aria-pressed="false" class="rounded-full px-4 py-1.5 text-sm font-medium text-base-content/65 transition-colors hover:text-base-content">Done <span class="text-base-content/45" id="count-done">1</span></button>
+              </div>
+              <button id="clear-done-btn" class="btn btn-ghost btn-sm text-base-content/70"><i class="fa-solid fa-broom"></i>Clear completed</button>
+            </div>
+
+            <ul id="list" class="mt-4 space-y-3"></ul>
+
+            <div id="list-empty" class="hidden rounded-3xl border-2 border-dashed border-base-300 bg-base-100/60 px-6 py-14 text-center">
+              <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-xl text-primary"><i id="list-empty-icon" class="fa-solid fa-clipboard-check"></i></span>
+              <h3 id="list-empty-title" class="mt-4 font-display text-xl font-semibold">No todos yet</h3>
+              <p id="list-empty-text" class="mt-1 text-base-content/60">Add your first one above.</p>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <!-- ========================= SIDEBAR ========================= -->
+      <div class="drawer-side z-30">
+        <label for="drawer" aria-label="Close menu" class="drawer-overlay"></label>
+        <aside class="flex h-full w-72 flex-col bg-pine-950 text-pine-text">
+          <a href="/" class="flex items-center gap-3 px-6 pb-4 pt-6">
+            <span class="grid size-10 place-items-center rounded-xl bg-marigold text-pine-950"><i class="fa-solid fa-book-open"></i></span>
+            <span class="font-display text-2xl font-semibold text-white">Daybook</span>
+          </a>
+
+          <div class="px-6">
+            <label class="input w-full rounded-xl border-white/10 bg-white/10 text-white focus-within:border-marigold focus-within:outline-none">
+              <i class="fa-solid fa-magnifying-glass text-pine-muted"></i>
+              <input id="cat-search" type="search" class="placeholder:text-pine-muted" placeholder="Search categories" aria-label="Search categories" />
+            </label>
+          </div>
+
+          <div class="mx-6 my-5 h-px bg-white/10"></div>
+
+          <div class="mb-2 flex items-center justify-between px-6">
+            <h2 class="text-sm font-semibold text-pine-muted">Categories</h2>
+            <button id="cat-add" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Add category" title="Add category">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+
+          <ul id="cat-list" class="flex-1 space-y-1 overflow-y-auto pr-4">
+            <li>
+              <button data-cat="all" aria-current="true" class="flex w-full items-center gap-3 rounded-r-xl border-l-4 border-marigold bg-white/10 py-2.5 pl-5 pr-3 text-left font-medium text-white">
+                <i class="fa-solid fa-layer-group w-2.5 text-center text-pine-muted"></i>
+                <span class="flex-1 truncate">All</span>
+                <span data-count="all" class="text-xs tabular-nums text-pine-muted">4</span>
+              </button>
+            </li>
+          </ul>
+
+          <div id="user-card" class="m-4 flex items-center gap-3 rounded-2xl bg-white/5 p-3"></div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ========================= TEMPLATES ========================= -->
+
+    <template id="category-item-template">
+      <li class="group relative">
+        <button data-cat="" class="flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5">
+          <span data-role="dot" class="size-2.5 shrink-0 rounded-full"></span>
+          <span data-role="name" class="flex-1 truncate"></span>
+          <span data-role="count" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0 group-focus-within:opacity-0"></span>
+        </button>
+        <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+          <button data-action="edit-cat" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename category"><i class="fa-solid fa-pen"></i></button>
+          <button data-action="delete-cat" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete category"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </li>
+    </template>
+
+    <template id="todo-item-template">
+      <li data-role="item" class="group flex flex-wrap items-center gap-3 rounded-2xl border border-l-[5px] border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm">
+        <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" data-role="checkbox" />
+        <span data-role="text" data-todo-text title="Double-click to edit" class="min-w-0 flex-1 break-words text-lg"></span>
+        <span data-role="chip" class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"></span>
+        <div data-role="row-actions" class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+          <button data-action="edit" class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo"><i class="fa-solid fa-pen"></i></button>
+          <button data-action="delete" class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        <form data-role="edit-form" hidden class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+          <input name="text" class="input input-sm min-w-40 grow" maxlength="120" required autocomplete="off" aria-label="Edit todo" />
+          <select name="categoryId" class="select select-sm w-36" data-role="category-select" aria-label="Category">
+            <option value="">Uncategorized</option>
+          </select>
+          <button class="btn btn-primary btn-sm btn-square" aria-label="Save"><i class="fa-solid fa-check"></i></button>
+          <button type="button" data-action="cancel-edit" class="btn btn-ghost btn-sm btn-square" aria-label="Cancel"><i class="fa-solid fa-xmark"></i></button>
+        </form>
+      </li>
+    </template>
+
+    <!-- Category add/edit form -->
+    <template id="category-form-template">
+      <form class="p-6">
+        <h3 data-role="modal-title" class="font-display text-xl font-semibold">New category</h3>
+
+        <label class="mt-5 block">
+          <span class="mb-1.5 block text-sm font-medium">Name</span>
+          <input name="name" class="input w-full" maxlength="24" required placeholder="e.g. Health" />
+        </label>
+
+        <fieldset class="mt-5">
+          <legend class="mb-2 text-sm font-medium">Color</legend>
+          <div data-role="swatches" class="flex flex-wrap gap-3"></div>
+        </fieldset>
+
+        <div class="mt-7 flex justify-end gap-2">
+          <button type="button" data-action="close-modal" class="btn btn-ghost">Cancel</button>
+          <button data-role="submit-btn" class="btn btn-primary"><i class="fa-solid fa-check"></i>Add category</button>
+        </div>
+      </form>
+    </template>
+
+    <template id="swatch-template">
+      <label class="group cursor-pointer">
+        <input type="radio" name="color" value="" class="peer sr-only" />
+        <span data-role="swatch" class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
+          <i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i>
+        </span>
+      </label>
+    </template>
+
+    <!-- Confirm dialog -->
+    <template id="confirm-template">
+      <div class="p-6">
+        <div class="flex items-start gap-4">
+          <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-error/10 text-error"><i class="fa-solid fa-triangle-exclamation"></i></span>
+          <div>
+            <h3 data-role="title" class="font-display text-xl font-semibold"></h3>
+            <p data-role="message" class="mt-1 text-base-content/70"></p>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-end gap-2">
+          <button data-action="cancel" class="btn btn-ghost">Cancel</button>
+          <button data-action="confirm" class="btn btn-error"><i class="fa-solid fa-trash"></i><span data-role="confirm-label">Delete</span></button>
+        </div>
+      </div>
+    </template>
+
+    <!-- Name / login prompt -->
+    <template id="welcome-template">
+      <form class="p-8 text-center">
+        <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-marigold text-2xl text-pine-950"><i class="fa-solid fa-book-open"></i></span>
+        <h3 class="mt-5 font-display text-2xl font-semibold">Welcome to Daybook</h3>
+        <p class="mt-2 text-base-content/70">What should we call you? Your name shows on the posts and comments you write.</p>
+        <input name="name" class="input mt-6 w-full text-center" maxlength="24" required autofocus placeholder="Your name" aria-label="Your name" />
+        <button class="btn btn-primary mt-4 w-full">Get started</button>
+        <p class="mt-4 text-xs text-base-content/50">Demo login. Everything is saved only in this browser.</p>
+      </form>
+    </template>
+
     <script type="module" src="/src/todo.js"></script>
   </body>
 </html>
