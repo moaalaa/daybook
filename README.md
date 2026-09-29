@@ -1,8 +1,8 @@
 # Daybook
 
-Posts + Todo app: **real HTML** (Tailwind CSS v4, daisyUI 5, Font Awesome), plain
-JavaScript for behavior only — no React/Vue, no HTML built from JS strings.
-No backend: data is saved in your browser's localStorage.
+Posts + Todo app: **plain static HTML** (Tailwind CSS v4, daisyUI 5, Font Awesome)
+with **one JavaScript file** for behavior. No React/Vue/Nuxt/Next, no JS templating,
+no virtual DOM. Data is saved to the browser's localStorage.
 
 ```bash
 npm install
@@ -10,34 +10,44 @@ npm run dev      # http://localhost:5173
 npm run build    # production build in dist/
 ```
 
-## Why this isn't "JS framework-y"
+## What's actually in this project
 
-- `index.html` and `todo.html` contain the **actual markup** — every button, form,
-  heading and list you see is written directly in HTML. View-source and it's all there.
-- Repeating things (a post card, a comment, a todo row, a category) are real
-  `<template>` tags in the HTML — a native browser feature, not a template string.
-  JS clones them (`content.cloneNode`) and fills in text with `textContent`.
-- The JS files only do three things: query elements that already exist, clone a
-  `<template>` when a new item is needed, and listen for clicks/submits.
+- **`index.html`** and **`todo.html`** — real, complete HTML pages. Every post,
+  comment, todo, category and modal is written out as literal markup. Right-click
+  → View Page Source in a running app and you'll see the same tags you'd write
+  by hand — nothing is built by JavaScript.
+- **`src/app.js`** — the only script. It doesn't generate HTML strings and it
+  doesn't use `<template>` cloning. It just:
+  - reads/writes `data-*` attributes and text on elements that already exist,
+  - shows/hides existing daisyUI `<dialog>` modals with `.showModal()` / `.close()`,
+  - saves the current state to `localStorage` and restores it on load.
+- **Modals are plain daisyUI.** Each one (`#post_modal`, `#category_modal`,
+  `#confirm_modal`, …) is a real `<dialog class="modal">` sitting in the HTML.
+  Because it has an `id`, the browser exposes it as a global automatically, so
+  `onclick="post_modal.showModal()"` in the markup is enough — that's the normal,
+  documented way to use daisyUI's dialog-based modal. No custom modal system.
 
-## Where to look (read in this order)
+## Why this works inside Livewire / Vue / Nuxt / React / Next
+
+Nothing here assumes a JS framework runtime. It's:
+- plain `<dialog>`, `<form>`, `onclick`/`onsubmit` attributes — supported by every
+  browser and every framework's raw HTML output,
+- one script tag, no build-time JSX/SFC compilation required to understand it,
+- functions attached to `window` so inline HTML attributes can call them, which is
+  exactly how you'd wire up behavior in a server-rendered Blade/Livewire view too.
+
+You can lift `index.html`'s markup into a Blade view or a Vue template's static
+parts, drop `app.js` in as-is (or port the handful of functions to Alpine/Livewire
+actions), and it behaves the same.
+
+## Where to look
 
 | File | What it does |
 |---|---|
-| `index.html` / `todo.html` | The real markup for each page, plus the `<template>` tags |
-| `src/store.js`  | Data + CRUD functions (create / read / update / delete), saved to localStorage |
-| `src/dom.js`    | Tiny helpers: clone a template, open a modal, show a toast |
-| `src/sidebar.js`| Behavior for the sidebar/header that's shared by both pages |
-| `src/posts.js`  | Posts page behavior: posts CRUD + comments CRUD |
-| `src/todo.js`   | Todo page behavior: todos CRUD, filters, progress |
+| `index.html` | Posts page: every post + comment written directly as HTML, plus the post/category/comment/confirm/welcome `<dialog>` modals |
+| `todo.html` | Todo page: every todo written directly as HTML, plus the todo/category/confirm/welcome `<dialog>` modals |
+| `src/app.js` | All behavior: category select, search, filters, and full add/edit/delete for posts, comments, todos, categories |
 | `src/style.css` | Theme colors, fonts |
-
-## The pattern used everywhere
-
-1. A user action (click / submit) calls a function in `store.js`.
-2. The store updates the data and saves it to localStorage.
-3. The page's JS re-draws just the part of the *existing* HTML that changed —
-   usually by cloning a `<template>` and calling `.append()` / `.replaceWith()`.
 
 ## Tweak the look
 

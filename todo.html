@@ -41,7 +41,7 @@
         <!-- Page content -->
         <main class="flex-1 px-4 py-8 sm:px-10 sm:py-10">
           <div class="mx-auto max-w-2xl">
-            <h1 id="head-title" class="flex items-center gap-3 font-display text-4xl font-semibold tracking-tight">All todos</h1>
+            <h1 class="flex items-center gap-3 font-display text-4xl font-semibold tracking-tight">All todos</h1>
             <div class="mt-3 flex items-center gap-4">
               <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-base-300" role="progressbar" id="progress-track" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" aria-label="Completed">
                 <div id="progress-bar" class="h-full rounded-full bg-primary transition-all duration-500" style="width: 25%"></div>
@@ -49,25 +49,79 @@
               <p class="shrink-0 text-sm text-base-content/60"><span id="progress-done" class="font-semibold text-base-content">1</span> of <span id="progress-total">4</span> done</p>
             </div>
 
-            <form id="add-form" class="mt-6 flex flex-col gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 shadow-sm focus-within:ring-2 focus-within:ring-primary/30 sm:flex-row sm:items-center">
+            <form id="add-form" class="mt-6 flex flex-col gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 shadow-sm focus-within:ring-2 focus-within:ring-primary/30 sm:flex-row sm:items-center" onsubmit="return submitAddTodo(event)">
               <div class="flex grow items-center gap-3 pl-3">
                 <i class="fa-regular fa-circle shrink-0 text-base-content/35" aria-hidden="true"></i>
                 <input name="text" class="w-full bg-transparent py-2 text-lg outline-none placeholder:text-base-content/40" maxlength="120" required autocomplete="off" placeholder="Add a todo" aria-label="Add a todo" />
               </div>
-              <div id="add-target" class="flex items-center gap-2"></div>
+              <select name="categoryId" id="add-category-select" class="select select-sm w-full rounded-full sm:w-40" aria-label="Category">
+                <option value="">Uncategorized</option>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="learning">Learning</option>
+              </select>
               <button class="btn btn-primary"><i class="fa-solid fa-plus"></i>Add</button>
             </form>
 
             <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
               <div class="inline-flex rounded-full border border-base-300 bg-base-100 p-1" role="group" aria-label="Filter todos">
-                <button data-filter="all" aria-pressed="true" class="rounded-full bg-neutral px-4 py-1.5 text-sm font-medium text-neutral-content">All <span class="text-neutral-content/70" id="count-all">4</span></button>
-                <button data-filter="active" aria-pressed="false" class="rounded-full px-4 py-1.5 text-sm font-medium text-base-content/65 transition-colors hover:text-base-content">Active <span class="text-base-content/45" id="count-active">3</span></button>
-                <button data-filter="done" aria-pressed="false" class="rounded-full px-4 py-1.5 text-sm font-medium text-base-content/65 transition-colors hover:text-base-content">Done <span class="text-base-content/45" id="count-done">1</span></button>
+                <button data-filter="all" aria-pressed="true" class="filter-btn rounded-full bg-neutral px-4 py-1.5 text-sm font-medium text-neutral-content" onclick="setFilter('all')">All <span class="text-neutral-content/70" id="count-all">4</span></button>
+                <button data-filter="active" aria-pressed="false" class="filter-btn rounded-full px-4 py-1.5 text-sm font-medium text-base-content/65 transition-colors hover:text-base-content" onclick="setFilter('active')">Active <span class="text-base-content/45" id="count-active">3</span></button>
+                <button data-filter="done" aria-pressed="false" class="filter-btn rounded-full px-4 py-1.5 text-sm font-medium text-base-content/65 transition-colors hover:text-base-content" onclick="setFilter('done')">Done <span class="text-base-content/45" id="count-done">1</span></button>
               </div>
-              <button id="clear-done-btn" class="btn btn-ghost btn-sm text-base-content/70"><i class="fa-solid fa-broom"></i>Clear completed</button>
+              <button id="clear-done-btn" class="btn btn-ghost btn-sm text-base-content/70" onclick="confirmClearCompleted()"><i class="fa-solid fa-broom"></i>Clear completed</button>
             </div>
 
-            <ul id="list" class="mt-4 space-y-3"></ul>
+            <!-- ========================= TODO LIST (real markup, one <li> per todo) ========================= -->
+            <ul id="list" class="mt-4 space-y-3">
+              <li id="todo-t1" class="todo-item group flex flex-wrap items-center gap-3 rounded-2xl border border-l-[5px] border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm" style="border-left-color:#3e8ede" data-category="work" data-done="false" data-text="Review pull requests">
+                <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" aria-label="Mark &quot;Review pull requests&quot; as done" onchange="toggleTodo('t1')" />
+                <span class="min-w-0 flex-1 break-words text-lg todo-text" ondblclick="editTodo('t1')" title="Double-click to edit">Review pull requests</span>
+                <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #3e8ede 16%, white); color:color-mix(in oklab, #3e8ede 62%, black)">
+                  <span class="size-2 rounded-full" style="background:#3e8ede"></span>Work
+                </span>
+                <div class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo" onclick="editTodo('t1')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo" onclick="confirmDeleteTodo('t1', 'Review pull requests')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </li>
+
+              <li id="todo-t2" class="todo-item group flex flex-wrap items-center gap-3 rounded-2xl border border-l-[5px] border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm" style="border-left-color:#3e8ede" data-category="work" data-done="true" data-text="Write the release notes">
+                <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" checked aria-label="Mark &quot;Write the release notes&quot; as not done" onchange="toggleTodo('t2')" />
+                <span class="min-w-0 flex-1 break-words text-lg todo-text text-base-content/40 line-through" ondblclick="editTodo('t2')" title="Double-click to edit">Write the release notes</span>
+                <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #3e8ede 16%, white); color:color-mix(in oklab, #3e8ede 62%, black)">
+                  <span class="size-2 rounded-full" style="background:#3e8ede"></span>Work
+                </span>
+                <div class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo" onclick="editTodo('t2')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo" onclick="confirmDeleteTodo('t2', 'Write the release notes')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </li>
+
+              <li id="todo-t3" class="todo-item group flex flex-wrap items-center gap-3 rounded-2xl border border-l-[5px] border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm" style="border-left-color:#e5677d" data-category="personal" data-done="false" data-text="Buy groceries">
+                <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" aria-label="Mark &quot;Buy groceries&quot; as done" onchange="toggleTodo('t3')" />
+                <span class="min-w-0 flex-1 break-words text-lg todo-text" ondblclick="editTodo('t3')" title="Double-click to edit">Buy groceries</span>
+                <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #e5677d 16%, white); color:color-mix(in oklab, #e5677d 62%, black)">
+                  <span class="size-2 rounded-full" style="background:#e5677d"></span>Personal
+                </span>
+                <div class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo" onclick="editTodo('t3')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo" onclick="confirmDeleteTodo('t3', 'Buy groceries')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </li>
+
+              <li id="todo-t4" class="todo-item group flex flex-wrap items-center gap-3 rounded-2xl border border-l-[5px] border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm" style="border-left-color:#7c6bd6" data-category="learning" data-done="false" data-text="Read the daisyUI docs for the modal component">
+                <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" aria-label="Mark &quot;Read the daisyUI docs for the modal component&quot; as done" onchange="toggleTodo('t4')" />
+                <span class="min-w-0 flex-1 break-words text-lg todo-text" ondblclick="editTodo('t4')" title="Double-click to edit">Read the daisyUI docs for the modal component</span>
+                <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #7c6bd6 16%, white); color:color-mix(in oklab, #7c6bd6 62%, black)">
+                  <span class="size-2 rounded-full" style="background:#7c6bd6"></span>Learning
+                </span>
+                <div class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo" onclick="editTodo('t4')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo" onclick="confirmDeleteTodo('t4', 'Read the daisyUI docs for the modal component')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </li>
+            </ul>
 
             <div id="list-empty" class="hidden rounded-3xl border-2 border-dashed border-base-300 bg-base-100/60 px-6 py-14 text-center">
               <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-xl text-primary"><i id="list-empty-icon" class="fa-solid fa-clipboard-check"></i></span>
@@ -78,7 +132,7 @@
         </main>
       </div>
 
-      <!-- ========================= SIDEBAR ========================= -->
+      <!-- ========================= SIDEBAR (same as index.html) ========================= -->
       <div class="drawer-side z-30">
         <label for="drawer" aria-label="Close menu" class="drawer-overlay"></label>
         <aside class="flex h-full w-72 flex-col bg-pine-950 text-pine-text">
@@ -98,122 +152,195 @@
 
           <div class="mb-2 flex items-center justify-between px-6">
             <h2 class="text-sm font-semibold text-pine-muted">Categories</h2>
-            <button id="cat-add" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Add category" title="Add category">
+            <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Add category" title="Add category" onclick="category_modal.showModal()">
               <i class="fa-solid fa-plus"></i>
             </button>
           </div>
 
           <ul id="cat-list" class="flex-1 space-y-1 overflow-y-auto pr-4">
-            <li>
-              <button data-cat="all" aria-current="true" class="flex w-full items-center gap-3 rounded-r-xl border-l-4 border-marigold bg-white/10 py-2.5 pl-5 pr-3 text-left font-medium text-white">
+            <li data-cat-row="all">
+              <button data-cat="all" aria-current="true" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-marigold bg-white/10 py-2.5 pl-5 pr-3 text-left font-medium text-white" onclick="selectCategory('all')">
                 <i class="fa-solid fa-layer-group w-2.5 text-center text-pine-muted"></i>
                 <span class="flex-1 truncate">All</span>
-                <span data-count="all" class="text-xs tabular-nums text-pine-muted">4</span>
+                <span data-count="all" class="text-xs tabular-nums text-pine-muted">3</span>
               </button>
+            </li>
+
+            <li data-cat-row="work" data-cat-name="work">
+              <div class="group relative">
+                <button data-cat="work" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5" onclick="selectCategory('work')">
+                  <span class="size-2.5 shrink-0 rounded-full" style="background:#3e8ede"></span>
+                  <span class="flex-1 truncate">Work</span>
+                  <span data-count="work" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0">1</span>
+                </button>
+                <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename Work" onclick="editCategory('work', 'Work', '#3e8ede')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete Work" onclick="confirmDeleteCategory('work', 'Work')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </li>
+
+            <li data-cat-row="personal" data-cat-name="personal">
+              <div class="group relative">
+                <button data-cat="personal" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5" onclick="selectCategory('personal')">
+                  <span class="size-2.5 shrink-0 rounded-full" style="background:#e5677d"></span>
+                  <span class="flex-1 truncate">Personal</span>
+                  <span data-count="personal" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0">1</span>
+                </button>
+                <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename Personal" onclick="editCategory('personal', 'Personal', '#e5677d')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete Personal" onclick="confirmDeleteCategory('personal', 'Personal')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </li>
+
+            <li data-cat-row="learning" data-cat-name="learning">
+              <div class="group relative">
+                <button data-cat="learning" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5" onclick="selectCategory('learning')">
+                  <span class="size-2.5 shrink-0 rounded-full" style="background:#7c6bd6"></span>
+                  <span class="flex-1 truncate">Learning</span>
+                  <span data-count="learning" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0">1</span>
+                </button>
+                <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename Learning" onclick="editCategory('learning', 'Learning', '#7c6bd6')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete Learning" onclick="confirmDeleteCategory('learning', 'Learning')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
             </li>
           </ul>
 
-          <div id="user-card" class="m-4 flex items-center gap-3 rounded-2xl bg-white/5 p-3"></div>
+          <div class="m-4 flex items-center gap-3 rounded-2xl bg-white/5 p-3">
+            <span id="user-avatar" class="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white current-user-avatar">?</span>
+            <div class="min-w-0 flex-1">
+              <p id="user-name" class="truncate font-medium text-white">Guest</p>
+              <p class="text-xs text-pine-muted">Signed in</p>
+            </div>
+            <button class="btn btn-ghost btn-sm btn-square text-pine-text hover:bg-white/10" aria-label="Log out" title="Log out" onclick="logout()">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
         </aside>
       </div>
     </div>
 
-    <!-- ========================= TEMPLATES ========================= -->
+    <!-- ================================================================= -->
+    <!-- MODALS — real daisyUI <dialog class="modal"> elements -->
+    <!-- ================================================================= -->
 
-    <template id="category-item-template">
-      <li class="group relative">
-        <button data-cat="" class="flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5">
-          <span data-role="dot" class="size-2.5 shrink-0 rounded-full"></span>
-          <span data-role="name" class="flex-1 truncate"></span>
-          <span data-role="count" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0 group-focus-within:opacity-0"></span>
-        </button>
-        <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-          <button data-action="edit-cat" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename category"><i class="fa-solid fa-pen"></i></button>
-          <button data-action="delete-cat" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete category"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      </li>
-    </template>
-
-    <template id="todo-item-template">
-      <li data-role="item" class="group flex flex-wrap items-center gap-3 rounded-2xl border border-l-[5px] border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm">
-        <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" data-role="checkbox" />
-        <span data-role="text" data-todo-text title="Double-click to edit" class="min-w-0 flex-1 break-words text-lg"></span>
-        <span data-role="chip" class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"></span>
-        <div data-role="row-actions" class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-          <button data-action="edit" class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo"><i class="fa-solid fa-pen"></i></button>
-          <button data-action="delete" class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo"><i class="fa-solid fa-trash"></i></button>
-        </div>
-        <form data-role="edit-form" hidden class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-          <input name="text" class="input input-sm min-w-40 grow" maxlength="120" required autocomplete="off" aria-label="Edit todo" />
-          <select name="categoryId" class="select select-sm w-36" data-role="category-select" aria-label="Category">
-            <option value="">Uncategorized</option>
-          </select>
-          <button class="btn btn-primary btn-sm btn-square" aria-label="Save"><i class="fa-solid fa-check"></i></button>
-          <button type="button" data-action="cancel-edit" class="btn btn-ghost btn-sm btn-square" aria-label="Cancel"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Edit todo -->
+    <dialog id="todo_modal" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box max-w-md rounded-2xl p-0">
+        <form id="todo-form" class="p-6" onsubmit="return submitTodoEdit(event)">
+          <h3 class="font-display text-xl font-semibold">Edit todo</h3>
+          <input type="hidden" name="todoId" value="" />
+          <label class="mt-5 block">
+            <span class="mb-1.5 block text-sm font-medium">Text</span>
+            <input name="text" class="input w-full" maxlength="120" required />
+          </label>
+          <label class="mt-4 block">
+            <span class="mb-1.5 block text-sm font-medium">Category</span>
+            <select name="categoryId" class="select w-full">
+              <option value="">Uncategorized</option>
+              <option value="work">Work</option>
+              <option value="personal">Personal</option>
+              <option value="learning">Learning</option>
+            </select>
+          </label>
+          <div class="mt-7 flex justify-end gap-2">
+            <button type="button" class="btn btn-ghost" onclick="todo_modal.close()">Cancel</button>
+            <button class="btn btn-primary"><i class="fa-solid fa-check"></i>Save</button>
+          </div>
         </form>
-      </li>
-    </template>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+    </dialog>
 
-    <!-- Category add/edit form -->
-    <template id="category-form-template">
-      <form class="p-6">
-        <h3 data-role="modal-title" class="font-display text-xl font-semibold">New category</h3>
+    <!-- New / edit category -->
+    <dialog id="category_modal" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box max-w-md rounded-2xl p-0">
+        <form id="category-form" class="p-6" onsubmit="return submitCategory(event)">
+          <h3 id="category-modal-title" class="font-display text-xl font-semibold">New category</h3>
 
-        <label class="mt-5 block">
-          <span class="mb-1.5 block text-sm font-medium">Name</span>
-          <input name="name" class="input w-full" maxlength="24" required placeholder="e.g. Health" />
-        </label>
+          <input type="hidden" name="categoryId" value="" />
 
-        <fieldset class="mt-5">
-          <legend class="mb-2 text-sm font-medium">Color</legend>
-          <div data-role="swatches" class="flex flex-wrap gap-3"></div>
-        </fieldset>
+          <label class="mt-5 block">
+            <span class="mb-1.5 block text-sm font-medium">Name</span>
+            <input name="name" class="input w-full" maxlength="24" required placeholder="e.g. Health" />
+          </label>
 
-        <div class="mt-7 flex justify-end gap-2">
-          <button type="button" data-action="close-modal" class="btn btn-ghost">Cancel</button>
-          <button data-role="submit-btn" class="btn btn-primary"><i class="fa-solid fa-check"></i>Add category</button>
-        </div>
-      </form>
-    </template>
+          <fieldset class="mt-5">
+            <legend class="mb-2 text-sm font-medium">Color</legend>
+            <div class="flex flex-wrap gap-3">
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#2f9e8f" class="peer sr-only" checked />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#2f9e8f"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#3e8ede" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#3e8ede"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#7c6bd6" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#7c6bd6"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#e5677d" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#e5677d"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#e9a23b" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#e9a23b"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#8baa3d" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#8baa3d"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+            </div>
+          </fieldset>
 
-    <template id="swatch-template">
-      <label class="group cursor-pointer">
-        <input type="radio" name="color" value="" class="peer sr-only" />
-        <span data-role="swatch" class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
-          <i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i>
-        </span>
-      </label>
-    </template>
+          <div class="mt-7 flex justify-end gap-2">
+            <button type="button" class="btn btn-ghost" onclick="category_modal.close()">Cancel</button>
+            <button id="category-submit-btn" class="btn btn-primary"><i class="fa-solid fa-check"></i>Add category</button>
+          </div>
+        </form>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+    </dialog>
 
-    <!-- Confirm dialog -->
-    <template id="confirm-template">
-      <div class="p-6">
-        <div class="flex items-start gap-4">
-          <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-error/10 text-error"><i class="fa-solid fa-triangle-exclamation"></i></span>
-          <div>
-            <h3 data-role="title" class="font-display text-xl font-semibold"></h3>
-            <p data-role="message" class="mt-1 text-base-content/70"></p>
+    <!-- Confirm delete -->
+    <dialog id="confirm_modal" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box max-w-md rounded-2xl p-0">
+        <div class="p-6">
+          <div class="flex items-start gap-4">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-error/10 text-error"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <div>
+              <h3 id="confirm-title" class="font-display text-xl font-semibold">Delete this?</h3>
+              <p id="confirm-message" class="mt-1 text-base-content/70">This can't be undone.</p>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-2">
+            <button type="button" class="btn btn-ghost" onclick="confirm_modal.close()">Cancel</button>
+            <button id="confirm-btn" class="btn btn-error" onclick="runPendingDelete()"><i class="fa-solid fa-trash"></i>Delete</button>
           </div>
         </div>
-        <div class="mt-6 flex justify-end gap-2">
-          <button data-action="cancel" class="btn btn-ghost">Cancel</button>
-          <button data-action="confirm" class="btn btn-error"><i class="fa-solid fa-trash"></i><span data-role="confirm-label">Delete</span></button>
-        </div>
       </div>
-    </template>
+      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+    </dialog>
 
-    <!-- Name / login prompt -->
-    <template id="welcome-template">
-      <form class="p-8 text-center">
-        <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-marigold text-2xl text-pine-950"><i class="fa-solid fa-book-open"></i></span>
-        <h3 class="mt-5 font-display text-2xl font-semibold">Welcome to Daybook</h3>
-        <p class="mt-2 text-base-content/70">What should we call you? Your name shows on the posts and comments you write.</p>
-        <input name="name" class="input mt-6 w-full text-center" maxlength="24" required autofocus placeholder="Your name" aria-label="Your name" />
-        <button class="btn btn-primary mt-4 w-full">Get started</button>
-        <p class="mt-4 text-xs text-base-content/50">Demo login. Everything is saved only in this browser.</p>
-      </form>
-    </template>
+    <!-- Welcome / name prompt -->
+    <dialog id="welcome_modal" class="modal">
+      <div class="modal-box max-w-sm rounded-2xl p-0">
+        <form class="p-8 text-center" onsubmit="return submitWelcome(event)">
+          <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-marigold text-2xl text-pine-950"><i class="fa-solid fa-book-open"></i></span>
+          <h3 class="mt-5 font-display text-2xl font-semibold">Welcome to Daybook</h3>
+          <p class="mt-2 text-base-content/70">What should we call you? Your name shows on the posts and comments you write.</p>
+          <input name="name" class="input mt-6 w-full text-center" maxlength="24" required placeholder="Your name" aria-label="Your name" />
+          <button class="btn btn-primary mt-4 w-full">Get started</button>
+          <p class="mt-4 text-xs text-base-content/50">Demo login. Everything is saved only in this browser.</p>
+        </form>
+      </div>
+    </dialog>
 
-    <script type="module" src="/src/todo.js"></script>
+    <script type="module" src="/src/app.js"></script>
   </body>
 </html>

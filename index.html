@@ -43,19 +43,203 @@
           <div class="mx-auto max-w-2xl">
             <div class="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <h1 id="feed-title" class="flex items-center gap-3 font-display text-4xl font-semibold tracking-tight">All posts</h1>
+                <h1 class="flex items-center gap-3 font-display text-4xl font-semibold tracking-tight">All posts</h1>
                 <p id="feed-count" class="mt-1 text-base-content/60">3 posts</p>
               </div>
-              <button id="new-post-btn" class="btn btn-primary"><i class="fa-solid fa-plus"></i>New post</button>
+              <button class="btn btn-primary" onclick="post_modal.showModal()"><i class="fa-solid fa-plus"></i>New post</button>
             </div>
 
-            <div id="feed" class="mt-8 space-y-8"></div>
+            <!-- ========================= POST FEED (real markup, one <article> per post) ========================= -->
+            <div id="feed" class="mt-8 space-y-8">
 
+              <!-- ---------- Post 1 ---------- -->
+              <article id="post-p1" class="overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-sm" data-category="work" data-title="Shipped the first version of the dashboard" data-body="Two weeks of small steps and it finally feels solid. The biggest lesson: ship the boring version first, then polish it.">
+                <div class="relative aspect-[16/7] overflow-hidden" style="background:linear-gradient(135deg, #3e8ede, color-mix(in oklab, #3e8ede 50%, black))">
+                  <div class="cover-pattern absolute inset-0"></div>
+                  <i class="fa-solid fa-feather-pointed absolute -bottom-8 right-6 -rotate-12 text-[9rem] text-white/15"></i>
+
+                  <div class="absolute left-4 top-4 rounded-full bg-white shadow-sm">
+                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #3e8ede 16%, white); color:color-mix(in oklab, #3e8ede 62%, black)">
+                      <span class="size-2 rounded-full" style="background:#3e8ede"></span>Work
+                    </span>
+                  </div>
+                  <div class="absolute right-4 top-4 flex gap-2">
+                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-base-content shadow-sm hover:bg-white" aria-label="Edit post" onclick="editPost('p1')"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-error shadow-sm hover:bg-white" aria-label="Delete post" onclick="confirmDeletePost('p1', 'Shipped the first version of the dashboard')"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </div>
+
+                <div class="px-6 pb-5 pt-6">
+                  <h2 class="font-display text-2xl font-semibold leading-tight">Shipped the first version of the dashboard</h2>
+                  <p class="mt-2 whitespace-pre-line leading-relaxed text-base-content/75">Two weeks of small steps and it finally feels solid. The biggest lesson: ship the boring version first, then polish it.</p>
+
+                  <div class="mt-6 flex items-center justify-between gap-3">
+                    <div class="flex min-w-0 items-center gap-3">
+                      <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background:#6f8f2a">D</span>
+                      <div class="min-w-0 leading-tight">
+                        <p class="truncate text-sm font-medium">Daybook</p>
+                        <p class="text-xs text-base-content/55">5h ago</p>
+                      </div>
+                    </div>
+                    <button class="btn btn-neutral btn-sm rounded-full" onclick="toggleComments('p1')">
+                      <i class="fa-regular fa-comment"></i>Comments
+                      <span id="p1-comment-count" class="badge badge-sm border-0 bg-white/20 text-neutral-content">2</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div id="p1-comments" class="comments">
+                  <div inert>
+                    <div class="border-t border-base-300 bg-base-200/60 px-6 py-5">
+                      <ul id="p1-comment-list" class="mb-5 space-y-4">
+                        <li class="group flex gap-3" data-comment-id="c1">
+                          <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white" style="background:#7c6bd6">M</span>
+                          <div class="min-w-0 flex-1">
+                            <div class="flex items-baseline gap-2">
+                              <span class="text-sm font-semibold">Maya</span>
+                              <span class="text-xs text-base-content/55">3h ago</span>
+                            </div>
+                            <p class="comment-text whitespace-pre-line break-words text-sm leading-relaxed text-base-content/85">Congrats! The loading states look great.</p>
+                          </div>
+                          <div class="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                            <button class="btn btn-ghost btn-xs btn-circle" aria-label="Edit comment" onclick="editComment('c1')"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-ghost btn-xs btn-circle text-error" aria-label="Delete comment" onclick="deleteComment('p1', 'c1')"><i class="fa-solid fa-trash"></i></button>
+                          </div>
+                        </li>
+                        <li class="group flex gap-3" data-comment-id="c2">
+                          <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white" style="background:#e5677d">O</span>
+                          <div class="min-w-0 flex-1">
+                            <div class="flex items-baseline gap-2">
+                              <span class="text-sm font-semibold">Omar</span>
+                              <span class="text-xs text-base-content/55">45m ago</span>
+                            </div>
+                            <p class="comment-text whitespace-pre-line break-words text-sm leading-relaxed text-base-content/85">Would love to hear how you handled caching.</p>
+                          </div>
+                          <div class="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                            <button class="btn btn-ghost btn-xs btn-circle" aria-label="Edit comment" onclick="editComment('c2')"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-ghost btn-xs btn-circle text-error" aria-label="Delete comment" onclick="deleteComment('p1', 'c2')"><i class="fa-solid fa-trash"></i></button>
+                          </div>
+                        </li>
+                      </ul>
+                      <form class="comment-form flex items-center gap-3" data-post-id="p1" onsubmit="return submitComment(event, 'p1')">
+                        <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white current-user-avatar">?</span>
+                        <input name="text" class="input grow rounded-full" maxlength="500" required autocomplete="off" placeholder="Write a comment" aria-label="Write a comment" />
+                        <button class="btn btn-primary btn-circle" aria-label="Send comment"><i class="fa-solid fa-paper-plane"></i></button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- ---------- Post 2 ---------- -->
+              <article id="post-p2" class="overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-sm" data-category="learning" data-title="Learning Tailwind: what finally clicked" data-body="Stop reading the docs top to bottom. Build one small card, look up only the classes you need, and repeat. Utilities stick faster when you use them.">
+                <div class="relative aspect-[16/7] overflow-hidden" style="background:linear-gradient(135deg, #7c6bd6, color-mix(in oklab, #7c6bd6 50%, black))">
+                  <div class="cover-pattern absolute inset-0"></div>
+                  <i class="fa-solid fa-feather-pointed absolute -bottom-8 right-6 -rotate-12 text-[9rem] text-white/15"></i>
+
+                  <div class="absolute left-4 top-4 rounded-full bg-white shadow-sm">
+                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #7c6bd6 16%, white); color:color-mix(in oklab, #7c6bd6 62%, black)">
+                      <span class="size-2 rounded-full" style="background:#7c6bd6"></span>Learning
+                    </span>
+                  </div>
+                  <div class="absolute right-4 top-4 flex gap-2">
+                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-base-content shadow-sm hover:bg-white" aria-label="Edit post" onclick="editPost('p2')"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-error shadow-sm hover:bg-white" aria-label="Delete post" onclick="confirmDeletePost('p2', 'Learning Tailwind: what finally clicked')"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </div>
+
+                <div class="px-6 pb-5 pt-6">
+                  <h2 class="font-display text-2xl font-semibold leading-tight">Learning Tailwind: what finally clicked</h2>
+                  <p class="mt-2 whitespace-pre-line leading-relaxed text-base-content/75">Stop reading the docs top to bottom. Build one small card, look up only the classes you need, and repeat. Utilities stick faster when you use them.</p>
+
+                  <div class="mt-6 flex items-center justify-between gap-3">
+                    <div class="flex min-w-0 items-center gap-3">
+                      <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background:#6f8f2a">D</span>
+                      <div class="min-w-0 leading-tight">
+                        <p class="truncate text-sm font-medium">Daybook</p>
+                        <p class="text-xs text-base-content/55">1d ago</p>
+                      </div>
+                    </div>
+                    <button class="btn btn-neutral btn-sm rounded-full" onclick="toggleComments('p2')">
+                      <i class="fa-regular fa-comment"></i>Comments
+                      <span id="p2-comment-count" class="badge badge-sm border-0 bg-white/20 text-neutral-content">0</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div id="p2-comments" class="comments">
+                  <div inert>
+                    <div class="border-t border-base-300 bg-base-200/60 px-6 py-5">
+                      <p id="p2-no-comments" class="mb-4 text-sm text-base-content/60">No comments yet. Start the conversation.</p>
+                      <ul id="p2-comment-list" class="mb-5 hidden space-y-4"></ul>
+                      <form class="comment-form flex items-center gap-3" data-post-id="p2" onsubmit="return submitComment(event, 'p2')">
+                        <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white current-user-avatar">?</span>
+                        <input name="text" class="input grow rounded-full" maxlength="500" required autocomplete="off" placeholder="Write a comment" aria-label="Write a comment" />
+                        <button class="btn btn-primary btn-circle" aria-label="Send comment"><i class="fa-solid fa-paper-plane"></i></button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- ---------- Post 3 ---------- -->
+              <article id="post-p3" class="overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-sm" data-category="personal" data-title="Sunday reset" data-body="Groceries, laundry, a long walk. Planning the week on paper before opening any screens made Monday feel lighter.">
+                <div class="relative aspect-[16/7] overflow-hidden" style="background:linear-gradient(135deg, #e5677d, color-mix(in oklab, #e5677d 50%, black))">
+                  <div class="cover-pattern absolute inset-0"></div>
+                  <i class="fa-solid fa-feather-pointed absolute -bottom-8 right-6 -rotate-12 text-[9rem] text-white/15"></i>
+
+                  <div class="absolute left-4 top-4 rounded-full bg-white shadow-sm">
+                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #e5677d 16%, white); color:color-mix(in oklab, #e5677d 62%, black)">
+                      <span class="size-2 rounded-full" style="background:#e5677d"></span>Personal
+                    </span>
+                  </div>
+                  <div class="absolute right-4 top-4 flex gap-2">
+                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-base-content shadow-sm hover:bg-white" aria-label="Edit post" onclick="editPost('p3')"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-error shadow-sm hover:bg-white" aria-label="Delete post" onclick="confirmDeletePost('p3', 'Sunday reset')"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </div>
+
+                <div class="px-6 pb-5 pt-6">
+                  <h2 class="font-display text-2xl font-semibold leading-tight">Sunday reset</h2>
+                  <p class="mt-2 whitespace-pre-line leading-relaxed text-base-content/75">Groceries, laundry, a long walk. Planning the week on paper before opening any screens made Monday feel lighter.</p>
+
+                  <div class="mt-6 flex items-center justify-between gap-3">
+                    <div class="flex min-w-0 items-center gap-3">
+                      <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background:#6f8f2a">D</span>
+                      <div class="min-w-0 leading-tight">
+                        <p class="truncate text-sm font-medium">Daybook</p>
+                        <p class="text-xs text-base-content/55">2d ago</p>
+                      </div>
+                    </div>
+                    <button class="btn btn-neutral btn-sm rounded-full" onclick="toggleComments('p3')">
+                      <i class="fa-regular fa-comment"></i>Comments
+                      <span id="p3-comment-count" class="badge badge-sm border-0 bg-white/20 text-neutral-content">0</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div id="p3-comments" class="comments">
+                  <div inert>
+                    <div class="border-t border-base-300 bg-base-200/60 px-6 py-5">
+                      <p id="p3-no-comments" class="mb-4 text-sm text-base-content/60">No comments yet. Start the conversation.</p>
+                      <ul id="p3-comment-list" class="mb-5 hidden space-y-4"></ul>
+                      <form class="comment-form flex items-center gap-3" data-post-id="p3" onsubmit="return submitComment(event, 'p3')">
+                        <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white current-user-avatar">?</span>
+                        <input name="text" class="input grow rounded-full" maxlength="500" required autocomplete="off" placeholder="Write a comment" aria-label="Write a comment" />
+                        <button class="btn btn-primary btn-circle" aria-label="Send comment"><i class="fa-solid fa-paper-plane"></i></button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+            </div>
+
+            <!-- Empty state: hidden by default, shown by app.js only when a filter/search leaves nothing -->
             <div id="feed-empty" class="hidden rounded-3xl border-2 border-dashed border-base-300 bg-base-100/60 px-6 py-16 text-center">
               <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-xl text-primary"><i id="feed-empty-icon" class="fa-solid fa-pen-nib"></i></span>
               <h3 id="feed-empty-title" class="mt-4 font-display text-xl font-semibold">No posts here yet</h3>
               <p id="feed-empty-text" class="mt-1 text-base-content/60">Write the first one for this category.</p>
-              <button id="feed-empty-btn" class="btn btn-primary mt-5"><i class="fa-solid fa-plus"></i>New post</button>
             </div>
           </div>
         </main>
@@ -81,219 +265,240 @@
 
           <div class="mb-2 flex items-center justify-between px-6">
             <h2 class="text-sm font-semibold text-pine-muted">Categories</h2>
-            <button id="cat-add" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Add category" title="Add category">
+            <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Add category" title="Add category" onclick="category_modal.showModal()">
               <i class="fa-solid fa-plus"></i>
             </button>
           </div>
 
+          <!-- ========================= CATEGORY LIST (real markup, one <li> per category) ========================= -->
           <ul id="cat-list" class="flex-1 space-y-1 overflow-y-auto pr-4">
-            <!-- "All" is real markup, always first -->
-            <li>
-              <button data-cat="all" aria-current="true" class="flex w-full items-center gap-3 rounded-r-xl border-l-4 border-marigold bg-white/10 py-2.5 pl-5 pr-3 text-left font-medium text-white">
+            <li data-cat-row="all">
+              <button data-cat="all" aria-current="true" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-marigold bg-white/10 py-2.5 pl-5 pr-3 text-left font-medium text-white" onclick="selectCategory('all')">
                 <i class="fa-solid fa-layer-group w-2.5 text-center text-pine-muted"></i>
                 <span class="flex-1 truncate">All</span>
                 <span data-count="all" class="text-xs tabular-nums text-pine-muted">3</span>
               </button>
             </li>
-            <!-- category <li> items are cloned from #category-item-template by posts.js -->
+
+            <li data-cat-row="work" data-cat-name="work">
+              <div class="group relative">
+                <button data-cat="work" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5" onclick="selectCategory('work')">
+                  <span class="size-2.5 shrink-0 rounded-full" style="background:#3e8ede"></span>
+                  <span class="flex-1 truncate">Work</span>
+                  <span data-count="work" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0">1</span>
+                </button>
+                <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename Work" onclick="editCategory('work', 'Work', '#3e8ede')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete Work" onclick="confirmDeleteCategory('work', 'Work')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </li>
+
+            <li data-cat-row="personal" data-cat-name="personal">
+              <div class="group relative">
+                <button data-cat="personal" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5" onclick="selectCategory('personal')">
+                  <span class="size-2.5 shrink-0 rounded-full" style="background:#e5677d"></span>
+                  <span class="flex-1 truncate">Personal</span>
+                  <span data-count="personal" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0">1</span>
+                </button>
+                <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename Personal" onclick="editCategory('personal', 'Personal', '#e5677d')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete Personal" onclick="confirmDeleteCategory('personal', 'Personal')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </li>
+
+            <li data-cat-row="learning" data-cat-name="learning">
+              <div class="group relative">
+                <button data-cat="learning" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5" onclick="selectCategory('learning')">
+                  <span class="size-2.5 shrink-0 rounded-full" style="background:#7c6bd6"></span>
+                  <span class="flex-1 truncate">Learning</span>
+                  <span data-count="learning" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0">1</span>
+                </button>
+                <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename Learning" onclick="editCategory('learning', 'Learning', '#7c6bd6')"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete Learning" onclick="confirmDeleteCategory('learning', 'Learning')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </li>
           </ul>
 
-          <div id="user-card" class="m-4 flex items-center gap-3 rounded-2xl bg-white/5 p-3"></div>
+          <div class="m-4 flex items-center gap-3 rounded-2xl bg-white/5 p-3">
+            <span id="user-avatar" class="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white current-user-avatar">?</span>
+            <div class="min-w-0 flex-1">
+              <p id="user-name" class="truncate font-medium text-white">Guest</p>
+              <p class="text-xs text-pine-muted">Signed in</p>
+            </div>
+            <button class="btn btn-ghost btn-sm btn-square text-pine-text hover:bg-white/10" aria-label="Log out" title="Log out" onclick="logout()">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
         </aside>
       </div>
     </div>
 
-    <!-- ========================= TEMPLATES ========================= -->
-    <!-- Real <template> tags: standard HTML, cloned by JS instead of built from strings. -->
+    <!-- ================================================================= -->
+    <!-- MODALS — real daisyUI <dialog class="modal"> elements, already in the DOM.
+         Opened with dialog.showModal(), closed with dialog.close(). Nothing custom. -->
+    <!-- ================================================================= -->
 
-    <template id="category-item-template">
-      <li class="group relative">
-        <button data-cat="" class="flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5">
-          <span data-role="dot" class="size-2.5 shrink-0 rounded-full"></span>
-          <span data-role="name" class="flex-1 truncate"></span>
-          <span data-role="count" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0 group-focus-within:opacity-0"></span>
-        </button>
-        <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-          <button data-action="edit-cat" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename category"><i class="fa-solid fa-pen"></i></button>
-          <button data-action="delete-cat" class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete category"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      </li>
-    </template>
-
-    <template id="post-template">
-      <article class="overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-sm" data-role="article">
-        <div class="relative aspect-[16/7] overflow-hidden" data-role="cover">
-          <div class="cover-pattern absolute inset-0"></div>
-          <i class="fa-solid fa-feather-pointed absolute -bottom-8 right-6 -rotate-12 text-[9rem] text-white/15"></i>
-          <img data-role="image" src="" alt="" loading="lazy" class="absolute inset-0 hidden size-full object-cover" />
-
-          <div class="absolute left-4 top-4 rounded-full bg-white shadow-sm">
-            <span data-role="chip" class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
-              <span data-role="chip-dot" class="size-2 rounded-full"></span>
-              <span data-role="chip-name"></span>
-            </span>
+    <!-- New / edit post -->
+    <dialog id="post_modal" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box max-w-lg rounded-2xl p-0">
+        <form id="post-form" class="p-6" onsubmit="return submitPost(event)">
+          <div class="flex items-start justify-between">
+            <h3 id="post-modal-title" class="font-display text-2xl font-semibold">Write a post</h3>
+            <button type="button" class="btn btn-ghost btn-sm btn-circle -mr-2 -mt-1" aria-label="Close" onclick="post_modal.close()"><i class="fa-solid fa-xmark"></i></button>
           </div>
-          <div class="absolute right-4 top-4 flex gap-2">
-            <button data-action="edit-post" class="btn btn-circle btn-sm border-0 bg-white/90 text-base-content shadow-sm hover:bg-white" aria-label="Edit post"><i class="fa-solid fa-pen"></i></button>
-            <button data-action="delete-post" class="btn btn-circle btn-sm border-0 bg-white/90 text-error shadow-sm hover:bg-white" aria-label="Delete post"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        </div>
 
-        <div class="px-6 pb-5 pt-6">
-          <h2 data-role="title" class="font-display text-2xl font-semibold leading-tight"></h2>
-          <p data-role="body" class="mt-2 hidden whitespace-pre-line leading-relaxed text-base-content/75"></p>
+          <input type="hidden" name="postId" value="" />
 
-          <div class="mt-6 flex items-center justify-between gap-3">
-            <div class="flex min-w-0 items-center gap-3">
-              <span data-role="avatar" class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"></span>
-              <div class="min-w-0 leading-tight">
-                <p data-role="author" class="truncate text-sm font-medium"></p>
-                <p data-role="time" class="text-xs text-base-content/55"></p>
-              </div>
-            </div>
-            <button data-action="toggle-comments" aria-expanded="false" class="btn btn-neutral btn-sm rounded-full">
-              <i class="fa-regular fa-comment"></i>Comments
-              <span data-role="comment-count" class="badge badge-sm border-0 bg-white/20 text-neutral-content">0</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="comments" data-role="comments-panel">
-          <div inert>
-            <div class="border-t border-base-300 bg-base-200/60 px-6 py-5">
-              <p data-role="no-comments" class="mb-4 hidden text-sm text-base-content/60">No comments yet. Start the conversation.</p>
-              <ul data-role="comment-list" class="mb-5 hidden space-y-4"></ul>
-              <form data-role="comment-form" class="flex items-center gap-3">
-                <span data-role="comment-form-avatar" class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"></span>
-                <input name="text" class="input grow rounded-full" maxlength="500" required autocomplete="off" placeholder="Write a comment" aria-label="Write a comment" />
-                <button class="btn btn-primary btn-circle" aria-label="Send comment"><i class="fa-solid fa-paper-plane"></i></button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </article>
-    </template>
-
-    <template id="comment-template">
-      <li class="group flex gap-3" data-role="comment-item">
-        <span data-role="avatar" class="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"></span>
-        <div class="min-w-0 flex-1">
-          <div class="flex items-baseline gap-2">
-            <span data-role="author" class="text-sm font-semibold"></span>
-            <span data-role="time" class="text-xs text-base-content/55"></span>
-          </div>
-          <p data-role="text" class="whitespace-pre-line break-words text-sm leading-relaxed text-base-content/85"></p>
-          <form data-role="edit-form" hidden class="mt-1.5 flex items-center gap-2">
-            <input name="text" class="input input-sm grow" maxlength="500" required autocomplete="off" aria-label="Edit comment" />
-            <button class="btn btn-primary btn-sm btn-square" aria-label="Save comment"><i class="fa-solid fa-check"></i></button>
-            <button type="button" data-action="cancel-edit-comment" class="btn btn-ghost btn-sm btn-square" aria-label="Cancel"><i class="fa-solid fa-xmark"></i></button>
-          </form>
-        </div>
-        <div data-role="comment-actions" class="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-          <button data-action="edit-comment" class="btn btn-ghost btn-xs btn-circle" aria-label="Edit comment"><i class="fa-solid fa-pen"></i></button>
-          <button data-action="delete-comment" class="btn btn-ghost btn-xs btn-circle text-error" aria-label="Delete comment"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      </li>
-    </template>
-
-    <!-- Post add/edit form, reused for both by swapping its title/button text -->
-    <template id="post-form-template">
-      <form class="p-6">
-        <div class="flex items-start justify-between">
-          <h3 data-role="modal-title" class="font-display text-2xl font-semibold">Write a post</h3>
-          <button type="button" data-action="close-modal" class="btn btn-ghost btn-sm btn-circle -mr-2 -mt-1" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <label class="mt-5 block">
-          <span class="mb-1.5 block text-sm font-medium">Title</span>
-          <input name="title" class="input w-full" maxlength="90" required autofocus placeholder="Give your post a title" />
-        </label>
-
-        <label class="mt-4 block">
-          <span class="mb-1.5 block text-sm font-medium">Story</span>
-          <textarea name="body" class="textarea min-h-32 w-full" maxlength="1000" placeholder="What do you want to share?"></textarea>
-        </label>
-
-        <div class="mt-4 grid gap-4 sm:grid-cols-2">
-          <label class="block">
-            <span class="mb-1.5 block text-sm font-medium">Category</span>
-            <select name="categoryId" class="select w-full" data-role="category-select">
-              <option value="">Uncategorized</option>
-            </select>
+          <label class="mt-5 block">
+            <span class="mb-1.5 block text-sm font-medium">Title</span>
+            <input name="title" class="input w-full" maxlength="90" required placeholder="Give your post a title" />
           </label>
-          <label class="block">
-            <span class="mb-1.5 block text-sm font-medium">Cover image link <span class="font-normal text-base-content/50">(optional)</span></span>
-            <input name="imageUrl" type="url" class="input w-full" placeholder="https://…" />
+
+          <label class="mt-4 block">
+            <span class="mb-1.5 block text-sm font-medium">Story</span>
+            <textarea name="body" class="textarea min-h-32 w-full" maxlength="1000" placeholder="What do you want to share?"></textarea>
           </label>
-        </div>
 
-        <div class="mt-7 flex justify-end gap-2">
-          <button type="button" data-action="close-modal" class="btn btn-ghost">Cancel</button>
-          <button data-role="submit-btn" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i>Publish</button>
-        </div>
-      </form>
-    </template>
-
-    <!-- Category add/edit form -->
-    <template id="category-form-template">
-      <form class="p-6">
-        <h3 data-role="modal-title" class="font-display text-xl font-semibold">New category</h3>
-
-        <label class="mt-5 block">
-          <span class="mb-1.5 block text-sm font-medium">Name</span>
-          <input name="name" class="input w-full" maxlength="24" required placeholder="e.g. Health" />
-        </label>
-
-        <fieldset class="mt-5">
-          <legend class="mb-2 text-sm font-medium">Color</legend>
-          <div data-role="swatches" class="flex flex-wrap gap-3"></div>
-        </fieldset>
-
-        <div class="mt-7 flex justify-end gap-2">
-          <button type="button" data-action="close-modal" class="btn btn-ghost">Cancel</button>
-          <button data-role="submit-btn" class="btn btn-primary"><i class="fa-solid fa-check"></i>Add category</button>
-        </div>
-      </form>
-    </template>
-
-    <template id="swatch-template">
-      <label class="group cursor-pointer">
-        <input type="radio" name="color" value="" class="peer sr-only" />
-        <span data-role="swatch" class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
-          <i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i>
-        </span>
-      </label>
-    </template>
-
-    <!-- Confirm-delete dialog -->
-    <template id="confirm-template">
-      <div class="p-6">
-        <div class="flex items-start gap-4">
-          <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-error/10 text-error"><i class="fa-solid fa-triangle-exclamation"></i></span>
-          <div>
-            <h3 data-role="title" class="font-display text-xl font-semibold"></h3>
-            <p data-role="message" class="mt-1 text-base-content/70"></p>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-medium">Category</span>
+              <select name="categoryId" class="select w-full">
+                <option value="">Uncategorized</option>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="learning">Learning</option>
+              </select>
+            </label>
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-medium">Cover color</span>
+              <select name="color" class="select w-full">
+                <option value="#3e8ede">Blue</option>
+                <option value="#e5677d">Rose</option>
+                <option value="#7c6bd6">Violet</option>
+                <option value="#e9a23b">Amber</option>
+                <option value="#8baa3d">Olive</option>
+                <option value="#2f9e8f">Teal</option>
+              </select>
+            </label>
           </div>
-        </div>
-        <div class="mt-6 flex justify-end gap-2">
-          <button data-action="cancel" class="btn btn-ghost">Cancel</button>
-          <button data-action="confirm" class="btn btn-error"><i class="fa-solid fa-trash"></i><span data-role="confirm-label">Delete</span></button>
+
+          <div class="mt-7 flex justify-end gap-2">
+            <button type="button" class="btn btn-ghost" onclick="post_modal.close()">Cancel</button>
+            <button id="post-submit-btn" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i>Publish</button>
+          </div>
+        </form>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+    </dialog>
+
+    <!-- New / edit category -->
+    <dialog id="category_modal" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box max-w-md rounded-2xl p-0">
+        <form id="category-form" class="p-6" onsubmit="return submitCategory(event)">
+          <h3 id="category-modal-title" class="font-display text-xl font-semibold">New category</h3>
+
+          <input type="hidden" name="categoryId" value="" />
+
+          <label class="mt-5 block">
+            <span class="mb-1.5 block text-sm font-medium">Name</span>
+            <input name="name" class="input w-full" maxlength="24" required placeholder="e.g. Health" />
+          </label>
+
+          <fieldset class="mt-5">
+            <legend class="mb-2 text-sm font-medium">Color</legend>
+            <div class="flex flex-wrap gap-3">
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#2f9e8f" class="peer sr-only" checked />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#2f9e8f"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#3e8ede" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#3e8ede"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#7c6bd6" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#7c6bd6"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#e5677d" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#e5677d"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#e9a23b" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#e9a23b"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+              <label class="group cursor-pointer">
+                <input type="radio" name="color" value="#8baa3d" class="peer sr-only" />
+                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#8baa3d"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="mt-7 flex justify-end gap-2">
+            <button type="button" class="btn btn-ghost" onclick="category_modal.close()">Cancel</button>
+            <button id="category-submit-btn" class="btn btn-primary"><i class="fa-solid fa-check"></i>Add category</button>
+          </div>
+        </form>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+    </dialog>
+
+    <!-- Edit comment -->
+    <dialog id="comment_modal" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box max-w-md rounded-2xl p-0">
+        <form id="comment-form" class="p-6" onsubmit="return submitCommentEdit(event)">
+          <h3 class="font-display text-xl font-semibold">Edit comment</h3>
+          <input type="hidden" name="commentId" value="" />
+          <label class="mt-5 block">
+            <textarea name="text" class="textarea min-h-24 w-full" maxlength="500" required></textarea>
+          </label>
+          <div class="mt-7 flex justify-end gap-2">
+            <button type="button" class="btn btn-ghost" onclick="comment_modal.close()">Cancel</button>
+            <button class="btn btn-primary"><i class="fa-solid fa-check"></i>Save</button>
+          </div>
+        </form>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+    </dialog>
+
+    <!-- Confirm delete (post / category / comment / todo — reused via confirm-title/confirm-message/pendingDelete) -->
+    <dialog id="confirm_modal" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box max-w-md rounded-2xl p-0">
+        <div class="p-6">
+          <div class="flex items-start gap-4">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-error/10 text-error"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <div>
+              <h3 id="confirm-title" class="font-display text-xl font-semibold">Delete this?</h3>
+              <p id="confirm-message" class="mt-1 text-base-content/70">This can't be undone.</p>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-2">
+            <button type="button" class="btn btn-ghost" onclick="confirm_modal.close()">Cancel</button>
+            <button id="confirm-btn" class="btn btn-error" onclick="runPendingDelete()"><i class="fa-solid fa-trash"></i>Delete</button>
+          </div>
         </div>
       </div>
-    </template>
+      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+    </dialog>
 
-    <!-- Name / login prompt -->
-    <template id="welcome-template">
-      <form class="p-8 text-center">
-        <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-marigold text-2xl text-pine-950"><i class="fa-solid fa-book-open"></i></span>
-        <h3 class="mt-5 font-display text-2xl font-semibold">Welcome to Daybook</h3>
-        <p class="mt-2 text-base-content/70">What should we call you? Your name shows on the posts and comments you write.</p>
-        <input name="name" class="input mt-6 w-full text-center" maxlength="24" required autofocus placeholder="Your name" aria-label="Your name" />
-        <button class="btn btn-primary mt-4 w-full">Get started</button>
-        <p class="mt-4 text-xs text-base-content/50">Demo login. Everything is saved only in this browser.</p>
-      </form>
-    </template>
+    <!-- Welcome / name prompt -->
+    <dialog id="welcome_modal" class="modal">
+      <div class="modal-box max-w-sm rounded-2xl p-0">
+        <form class="p-8 text-center" onsubmit="return submitWelcome(event)">
+          <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-marigold text-2xl text-pine-950"><i class="fa-solid fa-book-open"></i></span>
+          <h3 class="mt-5 font-display text-2xl font-semibold">Welcome to Daybook</h3>
+          <p class="mt-2 text-base-content/70">What should we call you? Your name shows on the posts and comments you write.</p>
+          <input name="name" class="input mt-6 w-full text-center" maxlength="24" required placeholder="Your name" aria-label="Your name" />
+          <button class="btn btn-primary mt-4 w-full">Get started</button>
+          <p class="mt-4 text-xs text-base-content/50">Demo login. Everything is saved only in this browser.</p>
+        </form>
+      </div>
+    </dialog>
 
-    <script type="module" src="/src/posts.js"></script>
+    <script type="module" src="/src/app.js"></script>
   </body>
 </html>
