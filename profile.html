@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile · Daybook</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body class="bg-base-200 text-base-content antialiased">
+    <div class="flex min-h-dvh flex-col">
+      <!-- ========================= HEADER (same as index.html) ========================= -->
+      <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-base-300 bg-base-100/85 px-4 backdrop-blur sm:px-8">
+        <a href="/" class="flex items-center gap-2.5">
+          <span class="grid size-9 place-items-center rounded-xl bg-marigold text-primary-content"><i class="fa-solid fa-book-open text-neutral"></i></span>
+          <span class="font-display text-xl font-semibold">Daybook</span>
+        </a>
+
+        <div id="header-auth">
+          <button class="btn btn-primary btn-sm" onclick="login_modal.showModal()">
+            <i class="fa-solid fa-right-to-bracket"></i>Log in
+          </button>
+        </div>
+      </header>
+
+      <!-- ========================= PAGE CONTENT ========================= -->
+      <main class="flex-1 px-4 py-8 sm:px-8 sm:py-10">
+        <div class="mx-auto max-w-lg">
+          <div class="flex items-center gap-4">
+            <span id="profile-avatar" class="inline-flex size-16 shrink-0 items-center justify-center rounded-full text-2xl font-semibold text-white" style="background:#5b7a74">?</span>
+            <div>
+              <h1 class="font-display text-3xl font-semibold tracking-tight">Edit profile</h1>
+              <p id="profile-subtitle" class="mt-1 text-base-content/60">Not logged in</p>
+            </div>
+          </div>
+
+          <form id="profile-form" class="mt-8 space-y-5 rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm sm:p-8" onsubmit="return submitProfile(event)">
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-medium">Username</span>
+              <label class="input w-full">
+                <i class="fa-solid fa-user text-base-content/40"></i>
+                <input name="username" id="profile-username" maxlength="24" required placeholder="Your username" autocomplete="username" />
+              </label>
+            </label>
+
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-medium">Email</span>
+              <label class="input w-full">
+                <i class="fa-solid fa-envelope text-base-content/40"></i>
+                <input name="email" id="profile-email" type="email" required placeholder="you@example.com" autocomplete="email" />
+              </label>
+            </label>
+
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-medium">New password <span class="font-normal text-base-content/50">(leave blank to keep current password)</span></span>
+              <label class="input w-full">
+                <i class="fa-solid fa-lock text-base-content/40"></i>
+                <input name="password" id="profile-password" type="password" minlength="4" placeholder="••••••••" autocomplete="new-password" />
+              </label>
+            </label>
+
+            <div class="flex items-center justify-between pt-2">
+              <p id="profile-status" class="text-sm text-base-content/50"></p>
+              <button class="btn btn-primary"><i class="fa-solid fa-check"></i>Save changes</button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+
+    <!-- Log in (from the header) -->
+    <dialog id="login_modal" class="modal">
+      <div class="modal-box max-w-sm rounded-2xl p-0">
+        <form class="p-8 text-center" onsubmit="return submitLogin(event)">
+          <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-marigold text-2xl text-neutral"><i class="fa-solid fa-book-open"></i></span>
+          <h3 class="mt-5 font-display text-2xl font-semibold">Log in to Daybook</h3>
+          <p class="mt-2 text-base-content/70">Enter your email and password to continue.</p>
+          <label class="input mt-6 w-full text-left">
+            <i class="fa-solid fa-envelope text-base-content/40"></i>
+            <input name="email" type="email" required placeholder="Email" aria-label="Email" />
+          </label>
+          <label class="input mt-3 w-full text-left">
+            <i class="fa-solid fa-lock text-base-content/40"></i>
+            <input name="password" type="password" required minlength="4" placeholder="Password" aria-label="Password" />
+          </label>
+          <button class="btn btn-primary mt-4 w-full">Log in</button>
+          <p class="mt-4 text-xs text-base-content/50">Demo login. Everything is saved only in this browser.</p>
+        </form>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+    </dialog>
+
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

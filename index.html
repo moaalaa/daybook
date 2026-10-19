@@ -3,461 +3,124 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Posts · Daybook</title>
+    <title>Todo · Daybook</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body class="bg-base-200 text-base-content antialiased">
-    <div class="drawer lg:drawer-open">
-      <input id="drawer" type="checkbox" class="drawer-toggle" />
+    <div class="flex min-h-dvh flex-col">
+      <!-- ========================= HEADER ========================= -->
+      <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-base-300 bg-base-100/85 px-4 backdrop-blur sm:px-8">
+        <a href="/" class="flex items-center gap-2.5">
+          <span class="grid size-9 place-items-center rounded-xl bg-marigold text-primary-content"><i class="fa-solid fa-book-open text-neutral"></i></span>
+          <span class="font-display text-xl font-semibold">Daybook</span>
+        </a>
 
-      <!-- ========================= MAIN COLUMN ========================= -->
-      <div class="drawer-content flex min-h-dvh min-w-0 flex-col">
-        <!-- Top bar -->
-        <header class="sticky top-0 z-20 flex h-16 items-end justify-between border-b border-base-300 bg-base-100/85 px-3 backdrop-blur sm:px-8">
-          <div class="flex items-end">
-            <label for="drawer" class="btn btn-ghost btn-square mb-1.5 mr-1 lg:hidden" aria-label="Open menu">
-              <i class="fa-solid fa-bars"></i>
-            </label>
-            <nav class="flex items-end" aria-label="Pages">
-              <a href="/" aria-current="page" class="flex items-center gap-2 border-b-[3px] border-marigold px-3 pb-3.5 pt-2 font-medium sm:px-4">
-                <i class="fa-solid fa-newspaper"></i>Posts
-              </a>
-              <a href="/todo.html" class="flex items-center gap-2 border-b-[3px] border-transparent px-3 pb-3.5 pt-2 font-medium text-base-content/55 transition-colors hover:text-base-content sm:px-4">
-                <i class="fa-solid fa-list-check"></i>Todo
-              </a>
-            </nav>
-          </div>
+        <!-- Logged out: Log in button. Logged in: avatar + name -> Profile. -->
+        <div id="header-auth">
+          <button class="btn btn-primary btn-sm" onclick="login_modal.showModal()">
+            <i class="fa-solid fa-right-to-bracket"></i>Log in
+          </button>
+        </div>
+      </header>
 
-          <div class="mb-2 flex items-center">
-            <div id="search-wrap" class="w-0 overflow-hidden transition-[width] duration-300" inert>
-              <input id="search" type="search" class="input input-sm w-44 rounded-full sm:w-64" placeholder="Search posts" aria-label="Search posts" />
+      <!-- ========================= PAGE CONTENT ========================= -->
+      <main class="flex-1 px-4 py-8 sm:px-8 sm:py-10">
+        <div class="mx-auto max-w-2xl">
+          <h1 class="font-display text-4xl font-semibold tracking-tight">My todos</h1>
+          <div class="mt-3 flex items-center gap-4">
+            <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-base-300" role="progressbar" id="progress-track" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" aria-label="Completed">
+              <div id="progress-bar" class="h-full rounded-full bg-primary transition-all duration-500" style="width: 25%"></div>
             </div>
-            <button id="search-toggle" class="btn btn-ghost btn-circle" aria-label="Search" aria-expanded="false">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
+            <p class="shrink-0 text-sm text-base-content/60"><span id="progress-done" class="font-semibold text-base-content">1</span> of <span id="progress-total">4</span> done</p>
           </div>
-        </header>
 
-        <!-- Page content -->
-        <main class="flex-1 px-4 py-8 sm:px-10 sm:py-10">
-          <div class="mx-auto max-w-2xl">
-            <div class="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <h1 class="flex items-center gap-3 font-display text-4xl font-semibold tracking-tight">All posts</h1>
-                <p id="feed-count" class="mt-1 text-base-content/60">3 posts</p>
-              </div>
-              <button class="btn btn-primary" onclick="post_modal.showModal()"><i class="fa-solid fa-plus"></i>New post</button>
+          <!-- Search box lives on the page, not in the header -->
+          <label class="input mt-6 w-full rounded-full">
+            <i class="fa-solid fa-magnifying-glass text-base-content/40"></i>
+            <input id="search" type="search" placeholder="Search todos" aria-label="Search todos" />
+          </label>
+
+          <form id="add-form" class="mt-4 flex flex-col gap-2 rounded-2xl border border-base-300 bg-base-100 p-2 shadow-sm focus-within:ring-2 focus-within:ring-primary/30 sm:flex-row sm:items-center" onsubmit="return submitAddTodo(event)">
+            <div class="flex grow items-center gap-3 pl-3">
+              <i class="fa-regular fa-circle shrink-0 text-base-content/35" aria-hidden="true"></i>
+              <input name="text" class="w-full bg-transparent py-2 text-lg outline-none placeholder:text-base-content/40" maxlength="120" required autocomplete="off" placeholder="Add a todo" aria-label="Add a todo" />
             </div>
+            <button class="btn btn-primary"><i class="fa-solid fa-plus"></i>Add</button>
+          </form>
 
-            <!-- ========================= POST FEED (real markup, one <article> per post) ========================= -->
-            <div id="feed" class="mt-8 space-y-8">
-
-              <!-- ---------- Post 1 ---------- -->
-              <article id="post-p1" class="overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-sm" data-category="work" data-title="Shipped the first version of the dashboard" data-body="Two weeks of small steps and it finally feels solid. The biggest lesson: ship the boring version first, then polish it.">
-                <div class="relative aspect-[16/7] overflow-hidden" style="background:linear-gradient(135deg, #3e8ede, color-mix(in oklab, #3e8ede 50%, black))">
-                  <div class="cover-pattern absolute inset-0"></div>
-                  <i class="fa-solid fa-feather-pointed absolute -bottom-8 right-6 -rotate-12 text-[9rem] text-white/15"></i>
-
-                  <div class="absolute left-4 top-4 rounded-full bg-white shadow-sm">
-                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #3e8ede 16%, white); color:color-mix(in oklab, #3e8ede 62%, black)">
-                      <span class="size-2 rounded-full" style="background:#3e8ede"></span>Work
-                    </span>
-                  </div>
-                  <div class="absolute right-4 top-4 flex gap-2">
-                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-base-content shadow-sm hover:bg-white" aria-label="Edit post" onclick="editPost('p1')"><i class="fa-solid fa-pen"></i></button>
-                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-error shadow-sm hover:bg-white" aria-label="Delete post" onclick="confirmDeletePost('p1', 'Shipped the first version of the dashboard')"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                </div>
-
-                <div class="px-6 pb-5 pt-6">
-                  <h2 class="font-display text-2xl font-semibold leading-tight">Shipped the first version of the dashboard</h2>
-                  <p class="mt-2 whitespace-pre-line leading-relaxed text-base-content/75">Two weeks of small steps and it finally feels solid. The biggest lesson: ship the boring version first, then polish it.</p>
-
-                  <div class="mt-6 flex items-center justify-between gap-3">
-                    <div class="flex min-w-0 items-center gap-3">
-                      <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background:#6f8f2a">D</span>
-                      <div class="min-w-0 leading-tight">
-                        <p class="truncate text-sm font-medium">Daybook</p>
-                        <p class="text-xs text-base-content/55">5h ago</p>
-                      </div>
-                    </div>
-                    <button class="btn btn-neutral btn-sm rounded-full" onclick="toggleComments('p1')">
-                      <i class="fa-regular fa-comment"></i>Comments
-                      <span id="p1-comment-count" class="badge badge-sm border-0 bg-white/20 text-neutral-content">2</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div id="p1-comments" class="comments">
-                  <div inert>
-                    <div class="border-t border-base-300 bg-base-200/60 px-6 py-5">
-                      <ul id="p1-comment-list" class="mb-5 space-y-4">
-                        <li class="group flex gap-3" data-comment-id="c1">
-                          <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white" style="background:#7c6bd6">M</span>
-                          <div class="min-w-0 flex-1">
-                            <div class="flex items-baseline gap-2">
-                              <span class="text-sm font-semibold">Maya</span>
-                              <span class="text-xs text-base-content/55">3h ago</span>
-                            </div>
-                            <p class="comment-text whitespace-pre-line break-words text-sm leading-relaxed text-base-content/85">Congrats! The loading states look great.</p>
-                          </div>
-                          <div class="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                            <button class="btn btn-ghost btn-xs btn-circle" aria-label="Edit comment" onclick="editComment('c1')"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-ghost btn-xs btn-circle text-error" aria-label="Delete comment" onclick="deleteComment('p1', 'c1')"><i class="fa-solid fa-trash"></i></button>
-                          </div>
-                        </li>
-                        <li class="group flex gap-3" data-comment-id="c2">
-                          <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white" style="background:#e5677d">O</span>
-                          <div class="min-w-0 flex-1">
-                            <div class="flex items-baseline gap-2">
-                              <span class="text-sm font-semibold">Omar</span>
-                              <span class="text-xs text-base-content/55">45m ago</span>
-                            </div>
-                            <p class="comment-text whitespace-pre-line break-words text-sm leading-relaxed text-base-content/85">Would love to hear how you handled caching.</p>
-                          </div>
-                          <div class="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                            <button class="btn btn-ghost btn-xs btn-circle" aria-label="Edit comment" onclick="editComment('c2')"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-ghost btn-xs btn-circle text-error" aria-label="Delete comment" onclick="deleteComment('p1', 'c2')"><i class="fa-solid fa-trash"></i></button>
-                          </div>
-                        </li>
-                      </ul>
-                      <form class="comment-form flex items-center gap-3" data-post-id="p1" onsubmit="return submitComment(event, 'p1')">
-                        <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white current-user-avatar">?</span>
-                        <input name="text" class="input grow rounded-full" maxlength="500" required autocomplete="off" placeholder="Write a comment" aria-label="Write a comment" />
-                        <button class="btn btn-primary btn-circle" aria-label="Send comment"><i class="fa-solid fa-paper-plane"></i></button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <!-- ---------- Post 2 ---------- -->
-              <article id="post-p2" class="overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-sm" data-category="learning" data-title="Learning Tailwind: what finally clicked" data-body="Stop reading the docs top to bottom. Build one small card, look up only the classes you need, and repeat. Utilities stick faster when you use them.">
-                <div class="relative aspect-[16/7] overflow-hidden" style="background:linear-gradient(135deg, #7c6bd6, color-mix(in oklab, #7c6bd6 50%, black))">
-                  <div class="cover-pattern absolute inset-0"></div>
-                  <i class="fa-solid fa-feather-pointed absolute -bottom-8 right-6 -rotate-12 text-[9rem] text-white/15"></i>
-
-                  <div class="absolute left-4 top-4 rounded-full bg-white shadow-sm">
-                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #7c6bd6 16%, white); color:color-mix(in oklab, #7c6bd6 62%, black)">
-                      <span class="size-2 rounded-full" style="background:#7c6bd6"></span>Learning
-                    </span>
-                  </div>
-                  <div class="absolute right-4 top-4 flex gap-2">
-                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-base-content shadow-sm hover:bg-white" aria-label="Edit post" onclick="editPost('p2')"><i class="fa-solid fa-pen"></i></button>
-                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-error shadow-sm hover:bg-white" aria-label="Delete post" onclick="confirmDeletePost('p2', 'Learning Tailwind: what finally clicked')"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                </div>
-
-                <div class="px-6 pb-5 pt-6">
-                  <h2 class="font-display text-2xl font-semibold leading-tight">Learning Tailwind: what finally clicked</h2>
-                  <p class="mt-2 whitespace-pre-line leading-relaxed text-base-content/75">Stop reading the docs top to bottom. Build one small card, look up only the classes you need, and repeat. Utilities stick faster when you use them.</p>
-
-                  <div class="mt-6 flex items-center justify-between gap-3">
-                    <div class="flex min-w-0 items-center gap-3">
-                      <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background:#6f8f2a">D</span>
-                      <div class="min-w-0 leading-tight">
-                        <p class="truncate text-sm font-medium">Daybook</p>
-                        <p class="text-xs text-base-content/55">1d ago</p>
-                      </div>
-                    </div>
-                    <button class="btn btn-neutral btn-sm rounded-full" onclick="toggleComments('p2')">
-                      <i class="fa-regular fa-comment"></i>Comments
-                      <span id="p2-comment-count" class="badge badge-sm border-0 bg-white/20 text-neutral-content">0</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div id="p2-comments" class="comments">
-                  <div inert>
-                    <div class="border-t border-base-300 bg-base-200/60 px-6 py-5">
-                      <p id="p2-no-comments" class="mb-4 text-sm text-base-content/60">No comments yet. Start the conversation.</p>
-                      <ul id="p2-comment-list" class="mb-5 hidden space-y-4"></ul>
-                      <form class="comment-form flex items-center gap-3" data-post-id="p2" onsubmit="return submitComment(event, 'p2')">
-                        <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white current-user-avatar">?</span>
-                        <input name="text" class="input grow rounded-full" maxlength="500" required autocomplete="off" placeholder="Write a comment" aria-label="Write a comment" />
-                        <button class="btn btn-primary btn-circle" aria-label="Send comment"><i class="fa-solid fa-paper-plane"></i></button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <!-- ---------- Post 3 ---------- -->
-              <article id="post-p3" class="overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-sm" data-category="personal" data-title="Sunday reset" data-body="Groceries, laundry, a long walk. Planning the week on paper before opening any screens made Monday feel lighter.">
-                <div class="relative aspect-[16/7] overflow-hidden" style="background:linear-gradient(135deg, #e5677d, color-mix(in oklab, #e5677d 50%, black))">
-                  <div class="cover-pattern absolute inset-0"></div>
-                  <i class="fa-solid fa-feather-pointed absolute -bottom-8 right-6 -rotate-12 text-[9rem] text-white/15"></i>
-
-                  <div class="absolute left-4 top-4 rounded-full bg-white shadow-sm">
-                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background:color-mix(in oklab, #e5677d 16%, white); color:color-mix(in oklab, #e5677d 62%, black)">
-                      <span class="size-2 rounded-full" style="background:#e5677d"></span>Personal
-                    </span>
-                  </div>
-                  <div class="absolute right-4 top-4 flex gap-2">
-                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-base-content shadow-sm hover:bg-white" aria-label="Edit post" onclick="editPost('p3')"><i class="fa-solid fa-pen"></i></button>
-                    <button class="btn btn-circle btn-sm border-0 bg-white/90 text-error shadow-sm hover:bg-white" aria-label="Delete post" onclick="confirmDeletePost('p3', 'Sunday reset')"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                </div>
-
-                <div class="px-6 pb-5 pt-6">
-                  <h2 class="font-display text-2xl font-semibold leading-tight">Sunday reset</h2>
-                  <p class="mt-2 whitespace-pre-line leading-relaxed text-base-content/75">Groceries, laundry, a long walk. Planning the week on paper before opening any screens made Monday feel lighter.</p>
-
-                  <div class="mt-6 flex items-center justify-between gap-3">
-                    <div class="flex min-w-0 items-center gap-3">
-                      <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background:#6f8f2a">D</span>
-                      <div class="min-w-0 leading-tight">
-                        <p class="truncate text-sm font-medium">Daybook</p>
-                        <p class="text-xs text-base-content/55">2d ago</p>
-                      </div>
-                    </div>
-                    <button class="btn btn-neutral btn-sm rounded-full" onclick="toggleComments('p3')">
-                      <i class="fa-regular fa-comment"></i>Comments
-                      <span id="p3-comment-count" class="badge badge-sm border-0 bg-white/20 text-neutral-content">0</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div id="p3-comments" class="comments">
-                  <div inert>
-                    <div class="border-t border-base-300 bg-base-200/60 px-6 py-5">
-                      <p id="p3-no-comments" class="mb-4 text-sm text-base-content/60">No comments yet. Start the conversation.</p>
-                      <ul id="p3-comment-list" class="mb-5 hidden space-y-4"></ul>
-                      <form class="comment-form flex items-center gap-3" data-post-id="p3" onsubmit="return submitComment(event, 'p3')">
-                        <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white current-user-avatar">?</span>
-                        <input name="text" class="input grow rounded-full" maxlength="500" required autocomplete="off" placeholder="Write a comment" aria-label="Write a comment" />
-                        <button class="btn btn-primary btn-circle" aria-label="Send comment"><i class="fa-solid fa-paper-plane"></i></button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <div class="inline-flex rounded-full border border-base-300 bg-base-100 p-1" role="group" aria-label="Filter todos">
+              <button data-filter="all" aria-pressed="true" class="filter-btn rounded-full bg-neutral px-4 py-1.5 text-sm font-medium text-neutral-content" onclick="setFilter('all')">All <span class="text-neutral-content/70" id="count-all">4</span></button>
+              <button data-filter="active" aria-pressed="false" class="filter-btn rounded-full px-4 py-1.5 text-sm font-medium text-base-content/65 transition-colors hover:text-base-content" onclick="setFilter('active')">Active <span class="text-base-content/45" id="count-active">3</span></button>
+              <button data-filter="done" aria-pressed="false" class="filter-btn rounded-full px-4 py-1.5 text-sm font-medium text-base-content/65 transition-colors hover:text-base-content" onclick="setFilter('done')">Done <span class="text-base-content/45" id="count-done">1</span></button>
             </div>
-
-            <!-- Empty state: hidden by default, shown by app.js only when a filter/search leaves nothing -->
-            <div id="feed-empty" class="hidden rounded-3xl border-2 border-dashed border-base-300 bg-base-100/60 px-6 py-16 text-center">
-              <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-xl text-primary"><i id="feed-empty-icon" class="fa-solid fa-pen-nib"></i></span>
-              <h3 id="feed-empty-title" class="mt-4 font-display text-xl font-semibold">No posts here yet</h3>
-              <p id="feed-empty-text" class="mt-1 text-base-content/60">Write the first one for this category.</p>
-            </div>
-          </div>
-        </main>
-      </div>
-
-      <!-- ========================= SIDEBAR ========================= -->
-      <div class="drawer-side z-30">
-        <label for="drawer" aria-label="Close menu" class="drawer-overlay"></label>
-        <aside class="flex h-full w-72 flex-col bg-pine-950 text-pine-text">
-          <a href="/" class="flex items-center gap-3 px-6 pb-4 pt-6">
-            <span class="grid size-10 place-items-center rounded-xl bg-marigold text-pine-950"><i class="fa-solid fa-book-open"></i></span>
-            <span class="font-display text-2xl font-semibold text-white">Daybook</span>
-          </a>
-
-          <div class="px-6">
-            <label class="input w-full rounded-xl border-white/10 bg-white/10 text-white focus-within:border-marigold focus-within:outline-none">
-              <i class="fa-solid fa-magnifying-glass text-pine-muted"></i>
-              <input id="cat-search" type="search" class="placeholder:text-pine-muted" placeholder="Search categories" aria-label="Search categories" />
-            </label>
+            <button id="clear-done-btn" class="btn btn-ghost btn-sm text-base-content/70" onclick="confirmClearCompleted()"><i class="fa-solid fa-broom"></i>Clear completed</button>
           </div>
 
-          <div class="mx-6 my-5 h-px bg-white/10"></div>
-
-          <div class="mb-2 flex items-center justify-between px-6">
-            <h2 class="text-sm font-semibold text-pine-muted">Categories</h2>
-            <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Add category" title="Add category" onclick="category_modal.showModal()">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </div>
-
-          <!-- ========================= CATEGORY LIST (real markup, one <li> per category) ========================= -->
-          <ul id="cat-list" class="flex-1 space-y-1 overflow-y-auto pr-4">
-            <li data-cat-row="all">
-              <button data-cat="all" aria-current="true" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-marigold bg-white/10 py-2.5 pl-5 pr-3 text-left font-medium text-white" onclick="selectCategory('all')">
-                <i class="fa-solid fa-layer-group w-2.5 text-center text-pine-muted"></i>
-                <span class="flex-1 truncate">All</span>
-                <span data-count="all" class="text-xs tabular-nums text-pine-muted">3</span>
-              </button>
-            </li>
-
-            <li data-cat-row="work" data-cat-name="work">
-              <div class="group relative">
-                <button data-cat="work" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5" onclick="selectCategory('work')">
-                  <span class="size-2.5 shrink-0 rounded-full" style="background:#3e8ede"></span>
-                  <span class="flex-1 truncate">Work</span>
-                  <span data-count="work" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0">1</span>
-                </button>
-                <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename Work" onclick="editCategory('work', 'Work', '#3e8ede')"><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete Work" onclick="confirmDeleteCategory('work', 'Work')"><i class="fa-solid fa-trash"></i></button>
-                </div>
+          <!-- ========================= TODO LIST (real markup, one <li> per todo) ========================= -->
+          <ul id="list" class="mt-4 space-y-3">
+            <li id="todo-t1" class="todo-item group flex flex-wrap items-center gap-3 rounded-2xl border border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm" data-done="false" data-text="Review pull requests">
+              <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" aria-label="Mark &quot;Review pull requests&quot; as done" onchange="toggleTodo('t1')" />
+              <span class="min-w-0 flex-1 break-words text-lg todo-text" ondblclick="editTodo('t1')" title="Double-click to edit">Review pull requests</span>
+              <div class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                <button class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo" onclick="editTodo('t1')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo" onclick="confirmDeleteTodo('t1', 'Review pull requests')"><i class="fa-solid fa-trash"></i></button>
               </div>
             </li>
 
-            <li data-cat-row="personal" data-cat-name="personal">
-              <div class="group relative">
-                <button data-cat="personal" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5" onclick="selectCategory('personal')">
-                  <span class="size-2.5 shrink-0 rounded-full" style="background:#e5677d"></span>
-                  <span class="flex-1 truncate">Personal</span>
-                  <span data-count="personal" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0">1</span>
-                </button>
-                <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename Personal" onclick="editCategory('personal', 'Personal', '#e5677d')"><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete Personal" onclick="confirmDeleteCategory('personal', 'Personal')"><i class="fa-solid fa-trash"></i></button>
-                </div>
+            <li id="todo-t2" class="todo-item group flex flex-wrap items-center gap-3 rounded-2xl border border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm" data-done="true" data-text="Write the release notes">
+              <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" checked aria-label="Mark &quot;Write the release notes&quot; as not done" onchange="toggleTodo('t2')" />
+              <span class="min-w-0 flex-1 break-words text-lg todo-text text-base-content/40 line-through" ondblclick="editTodo('t2')" title="Double-click to edit">Write the release notes</span>
+              <div class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                <button class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo" onclick="editTodo('t2')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo" onclick="confirmDeleteTodo('t2', 'Write the release notes')"><i class="fa-solid fa-trash"></i></button>
               </div>
             </li>
 
-            <li data-cat-row="learning" data-cat-name="learning">
-              <div class="group relative">
-                <button data-cat="learning" class="cat-btn flex w-full items-center gap-3 rounded-r-xl border-l-4 border-transparent py-2.5 pl-5 pr-3 text-left transition-colors hover:bg-white/5" onclick="selectCategory('learning')">
-                  <span class="size-2.5 shrink-0 rounded-full" style="background:#7c6bd6"></span>
-                  <span class="flex-1 truncate">Learning</span>
-                  <span data-count="learning" class="text-xs tabular-nums text-pine-muted transition-opacity group-hover:opacity-0">1</span>
-                </button>
-                <div class="absolute right-2 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-white/10" aria-label="Rename Learning" onclick="editCategory('learning', 'Learning', '#7c6bd6')"><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn btn-ghost btn-xs btn-circle text-pine-text hover:bg-error/40 hover:text-white" aria-label="Delete Learning" onclick="confirmDeleteCategory('learning', 'Learning')"><i class="fa-solid fa-trash"></i></button>
-                </div>
+            <li id="todo-t3" class="todo-item group flex flex-wrap items-center gap-3 rounded-2xl border border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm" data-done="false" data-text="Buy groceries">
+              <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" aria-label="Mark &quot;Buy groceries&quot; as done" onchange="toggleTodo('t3')" />
+              <span class="min-w-0 flex-1 break-words text-lg todo-text" ondblclick="editTodo('t3')" title="Double-click to edit">Buy groceries</span>
+              <div class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                <button class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo" onclick="editTodo('t3')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo" onclick="confirmDeleteTodo('t3', 'Buy groceries')"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </li>
+
+            <li id="todo-t4" class="todo-item group flex flex-wrap items-center gap-3 rounded-2xl border border-base-300 bg-base-100 py-3 pl-4 pr-3 shadow-sm" data-done="false" data-text="Read the daisyUI docs for the modal component">
+              <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-full" aria-label="Mark &quot;Read the daisyUI docs for the modal component&quot; as done" onchange="toggleTodo('t4')" />
+              <span class="min-w-0 flex-1 break-words text-lg todo-text" ondblclick="editTodo('t4')" title="Double-click to edit">Read the daisyUI docs for the modal component</span>
+              <div class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                <button class="btn btn-ghost btn-sm btn-circle" aria-label="Edit todo" onclick="editTodo('t4')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-ghost btn-sm btn-circle text-error" aria-label="Delete todo" onclick="confirmDeleteTodo('t4', 'Read the daisyUI docs for the modal component')"><i class="fa-solid fa-trash"></i></button>
               </div>
             </li>
           </ul>
 
-          <div class="m-4 flex items-center gap-3 rounded-2xl bg-white/5 p-3">
-            <span id="user-avatar" class="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white current-user-avatar">?</span>
-            <div class="min-w-0 flex-1">
-              <p id="user-name" class="truncate font-medium text-white">Guest</p>
-              <p class="text-xs text-pine-muted">Signed in</p>
-            </div>
-            <button class="btn btn-ghost btn-sm btn-square text-pine-text hover:bg-white/10" aria-label="Log out" title="Log out" onclick="logout()">
-              <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
+          <div id="list-empty" class="hidden rounded-3xl border-2 border-dashed border-base-300 bg-base-100/60 px-6 py-14 text-center">
+            <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-xl text-primary"><i id="list-empty-icon" class="fa-solid fa-clipboard-check"></i></span>
+            <h3 id="list-empty-title" class="mt-4 font-display text-xl font-semibold">No todos yet</h3>
+            <p id="list-empty-text" class="mt-1 text-base-content/60">Add your first one above.</p>
           </div>
-        </aside>
-      </div>
+        </div>
+      </main>
     </div>
 
     <!-- ================================================================= -->
-    <!-- MODALS — real daisyUI <dialog class="modal"> elements, already in the DOM.
-         Opened with dialog.showModal(), closed with dialog.close(). Nothing custom. -->
+    <!-- MODALS — real daisyUI <dialog class="modal"> elements -->
     <!-- ================================================================= -->
 
-    <!-- New / edit post -->
-    <dialog id="post_modal" class="modal modal-bottom sm:modal-middle">
-      <div class="modal-box max-w-lg rounded-2xl p-0">
-        <form id="post-form" class="p-6" onsubmit="return submitPost(event)">
-          <div class="flex items-start justify-between">
-            <h3 id="post-modal-title" class="font-display text-2xl font-semibold">Write a post</h3>
-            <button type="button" class="btn btn-ghost btn-sm btn-circle -mr-2 -mt-1" aria-label="Close" onclick="post_modal.close()"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-
-          <input type="hidden" name="postId" value="" />
-
-          <label class="mt-5 block">
-            <span class="mb-1.5 block text-sm font-medium">Title</span>
-            <input name="title" class="input w-full" maxlength="90" required placeholder="Give your post a title" />
-          </label>
-
-          <label class="mt-4 block">
-            <span class="mb-1.5 block text-sm font-medium">Story</span>
-            <textarea name="body" class="textarea min-h-32 w-full" maxlength="1000" placeholder="What do you want to share?"></textarea>
-          </label>
-
-          <div class="mt-4 grid gap-4 sm:grid-cols-2">
-            <label class="block">
-              <span class="mb-1.5 block text-sm font-medium">Category</span>
-              <select name="categoryId" class="select w-full">
-                <option value="">Uncategorized</option>
-                <option value="work">Work</option>
-                <option value="personal">Personal</option>
-                <option value="learning">Learning</option>
-              </select>
-            </label>
-            <label class="block">
-              <span class="mb-1.5 block text-sm font-medium">Cover color</span>
-              <select name="color" class="select w-full">
-                <option value="#3e8ede">Blue</option>
-                <option value="#e5677d">Rose</option>
-                <option value="#7c6bd6">Violet</option>
-                <option value="#e9a23b">Amber</option>
-                <option value="#8baa3d">Olive</option>
-                <option value="#2f9e8f">Teal</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="mt-7 flex justify-end gap-2">
-            <button type="button" class="btn btn-ghost" onclick="post_modal.close()">Cancel</button>
-            <button id="post-submit-btn" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i>Publish</button>
-          </div>
-        </form>
-      </div>
-      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
-    </dialog>
-
-    <!-- New / edit category -->
-    <dialog id="category_modal" class="modal modal-bottom sm:modal-middle">
+    <!-- Edit todo -->
+    <dialog id="todo_modal" class="modal modal-bottom sm:modal-middle">
       <div class="modal-box max-w-md rounded-2xl p-0">
-        <form id="category-form" class="p-6" onsubmit="return submitCategory(event)">
-          <h3 id="category-modal-title" class="font-display text-xl font-semibold">New category</h3>
-
-          <input type="hidden" name="categoryId" value="" />
-
+        <form id="todo-form" class="p-6" onsubmit="return submitTodoEdit(event)">
+          <h3 class="font-display text-xl font-semibold">Edit todo</h3>
+          <input type="hidden" name="todoId" value="" />
           <label class="mt-5 block">
-            <span class="mb-1.5 block text-sm font-medium">Name</span>
-            <input name="name" class="input w-full" maxlength="24" required placeholder="e.g. Health" />
-          </label>
-
-          <fieldset class="mt-5">
-            <legend class="mb-2 text-sm font-medium">Color</legend>
-            <div class="flex flex-wrap gap-3">
-              <label class="group cursor-pointer">
-                <input type="radio" name="color" value="#2f9e8f" class="peer sr-only" checked />
-                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#2f9e8f"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
-              </label>
-              <label class="group cursor-pointer">
-                <input type="radio" name="color" value="#3e8ede" class="peer sr-only" />
-                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#3e8ede"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
-              </label>
-              <label class="group cursor-pointer">
-                <input type="radio" name="color" value="#7c6bd6" class="peer sr-only" />
-                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#7c6bd6"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
-              </label>
-              <label class="group cursor-pointer">
-                <input type="radio" name="color" value="#e5677d" class="peer sr-only" />
-                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#e5677d"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
-              </label>
-              <label class="group cursor-pointer">
-                <input type="radio" name="color" value="#e9a23b" class="peer sr-only" />
-                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#e9a23b"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
-              </label>
-              <label class="group cursor-pointer">
-                <input type="radio" name="color" value="#8baa3d" class="peer sr-only" />
-                <span class="grid size-9 place-items-center rounded-full ring-offset-2 transition peer-checked:ring-2 peer-checked:ring-base-content" style="background:#8baa3d"><i class="fa-solid fa-check text-sm text-white opacity-0 group-has-[:checked]:opacity-100"></i></span>
-              </label>
-            </div>
-          </fieldset>
-
-          <div class="mt-7 flex justify-end gap-2">
-            <button type="button" class="btn btn-ghost" onclick="category_modal.close()">Cancel</button>
-            <button id="category-submit-btn" class="btn btn-primary"><i class="fa-solid fa-check"></i>Add category</button>
-          </div>
-        </form>
-      </div>
-      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
-    </dialog>
-
-    <!-- Edit comment -->
-    <dialog id="comment_modal" class="modal modal-bottom sm:modal-middle">
-      <div class="modal-box max-w-md rounded-2xl p-0">
-        <form id="comment-form" class="p-6" onsubmit="return submitCommentEdit(event)">
-          <h3 class="font-display text-xl font-semibold">Edit comment</h3>
-          <input type="hidden" name="commentId" value="" />
-          <label class="mt-5 block">
-            <textarea name="text" class="textarea min-h-24 w-full" maxlength="500" required></textarea>
+            <span class="mb-1.5 block text-sm font-medium">Text</span>
+            <input name="text" class="input w-full" maxlength="120" required />
           </label>
           <div class="mt-7 flex justify-end gap-2">
-            <button type="button" class="btn btn-ghost" onclick="comment_modal.close()">Cancel</button>
+            <button type="button" class="btn btn-ghost" onclick="todo_modal.close()">Cancel</button>
             <button class="btn btn-primary"><i class="fa-solid fa-check"></i>Save</button>
           </div>
         </form>
@@ -465,7 +128,7 @@
       <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
     </dialog>
 
-    <!-- Confirm delete (post / category / comment / todo — reused via confirm-title/confirm-message/pendingDelete) -->
+    <!-- Confirm delete -->
     <dialog id="confirm_modal" class="modal modal-bottom sm:modal-middle">
       <div class="modal-box max-w-md rounded-2xl p-0">
         <div class="p-6">
@@ -485,18 +148,26 @@
       <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
     </dialog>
 
-    <!-- Welcome / name prompt -->
-    <dialog id="welcome_modal" class="modal">
+    <!-- Log in (from the header) -->
+    <dialog id="login_modal" class="modal">
       <div class="modal-box max-w-sm rounded-2xl p-0">
-        <form class="p-8 text-center" onsubmit="return submitWelcome(event)">
-          <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-marigold text-2xl text-pine-950"><i class="fa-solid fa-book-open"></i></span>
-          <h3 class="mt-5 font-display text-2xl font-semibold">Welcome to Daybook</h3>
-          <p class="mt-2 text-base-content/70">What should we call you? Your name shows on the posts and comments you write.</p>
-          <input name="name" class="input mt-6 w-full text-center" maxlength="24" required placeholder="Your name" aria-label="Your name" />
-          <button class="btn btn-primary mt-4 w-full">Get started</button>
+        <form class="p-8 text-center" onsubmit="return submitLogin(event)">
+          <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-marigold text-2xl text-neutral"><i class="fa-solid fa-book-open"></i></span>
+          <h3 class="mt-5 font-display text-2xl font-semibold">Log in to Daybook</h3>
+          <p class="mt-2 text-base-content/70">Enter your email and password to continue.</p>
+          <label class="input mt-6 w-full text-left">
+            <i class="fa-solid fa-envelope text-base-content/40"></i>
+            <input name="email" type="email" required placeholder="Email" aria-label="Email" />
+          </label>
+          <label class="input mt-3 w-full text-left">
+            <i class="fa-solid fa-lock text-base-content/40"></i>
+            <input name="password" type="password" required minlength="4" placeholder="Password" aria-label="Password" />
+          </label>
+          <button class="btn btn-primary mt-4 w-full">Log in</button>
           <p class="mt-4 text-xs text-base-content/50">Demo login. Everything is saved only in this browser.</p>
         </form>
       </div>
+      <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
     </dialog>
 
     <script type="module" src="/src/app.js"></script>
